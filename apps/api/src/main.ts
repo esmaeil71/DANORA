@@ -1,8 +1,27 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+
+  app.use(cookieParser());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
+
+  const origin = process.env.WEB_ORIGIN ?? 'http://localhost:3000';
+  app.enableCors({
+    origin,
+    credentials: true,
+  });
+
+  const port = Number(process.env.API_PORT ?? 4000);
+  await app.listen(port);
+  console.log(`API listening on http://localhost:${port}`);
 }
 bootstrap();

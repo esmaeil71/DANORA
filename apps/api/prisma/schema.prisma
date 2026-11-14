@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserPlan {
+  free
+  pro
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
+}
+
+enum ModelProvider {
+  openai
+  anthropic
+  google
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  plan         UserPlan @default(free)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  conversations Conversation[]
+  usageDaily    UsageDaily[]
+
+  @@map("users")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String   @default("گفتگوی جدید")
+  modelId   String   @map("model_id")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model    ModelCatalog @relation(fields: [modelId], references: [id])
+  messages Message[]
+
+  @@index([userId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String      @map("conversation_id")
+  role           MessageRole
+  content        String      @db.Text
+  tokenIn        Int         @default(0) @map("token_in")
+  tokenOut       Int         @default(0) @map("token_out")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model ModelCatalog {
+  id                String        @id
+  provider          ModelProvider
+  displayName       String        @map("display_name")
+  apiModelName      String        @map("api_model_name")
+  enabled           Boolean       @default(true)
+  inputPricePer1k   Decimal       @default(0) @map("input_price_per_1k") @db.Decimal(10, 6)
+  outputPricePer1k  Decimal       @default(0) @map("output_price_per_1k") @db.Decimal(10, 6)
+
+  conversations Conversation[]
+
+  @@map("model_catalog")
+}
+
+model UsageDaily {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  date         DateTime @db.Date
+  messageCount Int      @default(0) @map("message_count")
+  tokenTotal   Int      @default(0) @map("token_total")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("usage_daily")
+}
