@@ -42,6 +42,23 @@ export class AuthService {
     return this.signToken(user.id, user.email);
   }
 
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+      throw new UnauthorizedException('رمز عبور فعلی نادرست است');
+    }
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+    return { ok: true };
+  }
+
   signToken(sub: string, email: string) {
     return this.jwt.sign({ sub, email });
   }

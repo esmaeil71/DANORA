@@ -1,0 +1,13 @@
+.settings-gapgpt {
+  --st-bg: #0f0f10;
+  --st-surface: #18181b;
+  --st-surface-hover: #27272a;
+  --st-border: #3f3f46;
+  --st-text: #fafafa;
+  --st-muted: #a1a1aa;
+  --st-accent: #8b5cf6;
+  --st-accent-soft: rgb(139 92 246 / 0.18);
+  color: var(--st-text);
+  background: var(--st-bg);
+  min-height: 100dvh;
+}

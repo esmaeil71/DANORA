@@ -33,6 +33,18 @@ export class UsageService {
     }
   }
 
+  async getDailySummary(userId: string) {
+    const date = startOfDayUTC();
+    const usage = await this.prisma.usageDaily.findUnique({
+      where: { userId_date: { userId, date } },
+    });
+    return {
+      messageCount: usage?.messageCount ?? 0,
+      tokenTotal: usage?.tokenTotal ?? 0,
+      limit: this.dailyLimit(),
+    };
+  }
+
   async recordMessage(userId: string, tokenIn: number, tokenOut: number) {
     const date = startOfDayUTC();
     await this.prisma.usageDaily.upsert({

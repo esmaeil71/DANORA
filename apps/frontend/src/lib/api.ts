@@ -58,6 +58,13 @@ export interface UserMe {
   id: string;
   email: string;
   plan: string;
+  createdAt?: string;
+}
+
+export interface UsageSummary {
+  messageCount: number;
+  tokenTotal: number;
+  limit: number;
 }
 
 export interface ModelRow {

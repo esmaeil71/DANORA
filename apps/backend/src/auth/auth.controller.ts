@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Res,
   UseGuards,
@@ -10,14 +11,16 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { ChangePasswordDto, LoginDto, RegisterDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { UsageService } from '../usage/usage.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private auth: AuthService,
     private config: ConfigService,
+    private readonly usageService: UsageService,
   ) {}
 
   private setAuthCookie(res: Response, token: string) {
@@ -59,7 +62,47 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  me(@Req() req: Request & { user: { id: string; email: string; plan: string } }) {
-    return req.user;
+  me(
+    @Req()
+    req: Request & {
+      user: {
+        id: string;
+        email: string;
+        plan: string;
+        createdAt?: Date;
+      };
+    },
+  ) {
+    const { id, email, plan, createdAt } = req.user;
+    return {
+      id,
+      email,
+      plan,
+      ...(createdAt && {
+        createdAt:
+          createdAt instanceof Date
+            ? createdAt.toISOString()
+            : new Date(createdAt).toISOString(),
+      }),
+    };
+  }
+
+  @Get('usage')
+  @UseGuards(JwtAuthGuard)
+  getUsageDaily(@Req() req: Request & { user: { id: string; plan: string } }) {
+    return this.usageService.getDailySummary(req.user.id);
+  }
+
+  @Patch('password')
+  @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @Req() req: Request & { user: { id: string } },
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.auth.changePassword(
+      req.user.id,
+      dto.currentPassword,
+      dto.newPassword,
+    );
   }
 }

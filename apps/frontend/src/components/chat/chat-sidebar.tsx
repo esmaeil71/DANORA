@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import type { ConversationRow, UserMe } from "@/lib/api";
+import { displayLabel } from "@/lib/user-prefs";
 
 export function ChatSidebar({
   open,
@@ -125,8 +126,8 @@ export function ChatSidebar({
 
         <div className="p-3 border-t border-[var(--chat-border)] text-xs text-[var(--chat-muted)] space-y-1">
           {user && (
-            <p className="truncate px-1" dir="ltr">
-              {user.email}
+            <p className="truncate px-1" title={user.email}>
+              {displayLabel(user.email)}
             </p>
           )}
           <Link
