@@ -1,0 +1,13 @@
+{
+  "name": "danora",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run --parallel dev:api dev:web",
+    "dev:api": "pnpm --filter @danora/api dev",
+    "dev:web": "pnpm --filter @danora/web dev",
+    "build": "pnpm run -r build",
+    "db:migrate": "pnpm --filter @danora/api prisma:migrate",
+    "db:seed": "pnpm --filter @danora/api prisma:seed"
+  }
+}
