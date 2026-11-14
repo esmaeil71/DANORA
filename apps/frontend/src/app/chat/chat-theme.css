@@ -1,0 +1,19 @@
+/* تم چت شبیه GapGPT — فقط داخل .chat-gapgpt */
+.chat-gapgpt {
+  --chat-bg: #0f0f10;
+  --chat-surface: #18181b;
+  --chat-surface-hover: #27272a;
+  --chat-border: #3f3f46;
+  --chat-text: #fafafa;
+  --chat-muted: #a1a1aa;
+  --chat-input-bg: #27272a;
+  --chat-user: #3f3f46;
+  --chat-accent: #8b5cf6;
+  --chat-accent-hover: #7c3aed;
+  color: var(--chat-text);
+  background: var(--chat-bg);
+}
+
+.chat-gapgpt ::selection {
+  background: rgb(139 92 246 / 0.35);
+}

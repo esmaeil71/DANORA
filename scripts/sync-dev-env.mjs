@@ -5,15 +5,20 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const envPath = join(root, ".env");
 
+function pick(text, key) {
+  const m = text.match(new RegExp(`^${key}=(.+)$`, "m"));
+  return m?.[1]?.trim();
+}
+
 if (!existsSync(envPath)) {
   console.warn(
-    "[sync-dev-env] فایل .env در ریشه پروژه نیست — از .env.example کپی کنید.",
+    "[sync-dev-env] no root .env — copy from .env.example",
   );
   process.exit(0);
 }
 
 const content = readFileSync(envPath, "utf8");
-writeFileSync(join(root, "apps/api/.env"), content);
+writeFileSync(join(root, "apps/backend/.env"), content);
 
 const webEnv = content
   .split("\n")
@@ -27,14 +32,9 @@ const webEnv = content
   })
   .join("\n");
 
-writeFileSync(
-  join(root, "apps/web/.env.local"),
-  `${webEnv.trim()}\nNEXT_PUBLIC_API_URL=${pick(content, "NEXT_PUBLIC_API_URL") ?? "http://localhost:4000"}\n`,
-);
+const apiUrl = pick(content, "NEXT_PUBLIC_API_URL") ?? "http://localhost:4000";
+const frontendEnv = `${webEnv.trim()}\nNEXT_PUBLIC_API_URL=${apiUrl}\n`;
 
-function pick(text, key) {
-  const m = text.match(new RegExp(`^${key}=(.+)$`, "m"));
-  return m?.[1]?.trim();
-}
+writeFileSync(join(root, "apps/frontend/.env.local"), frontendEnv);
 
-console.log("[sync-dev-env] apps/api/.env و apps/web/.env.local به‌روز شد.");
+console.log("[sync-dev-env] synced apps/backend/.env and apps/frontend/.env.local");

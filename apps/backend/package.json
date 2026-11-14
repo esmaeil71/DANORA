@@ -1,5 +1,5 @@
 {
-  "name": "@danora/api",
+  "name": "@danora/backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -9,8 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "dev": "pnpm run dev:prepare && nest start --watch",
-    "dev:prepare": "pnpm exec prisma generate && pnpm --filter @danora/shared build && rm -rf dist tsconfig.build.tsbuildinfo",
+    "dev": "prisma generate && nest start --watch",
     "start:dev": "nest start --watch",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -26,7 +25,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
-    "@danora/shared": "workspace:^",
+    "@danora/shared": "*",
     "@google/generative-ai": "^0.24.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^12.1.1",

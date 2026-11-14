@@ -1,6 +1,6 @@
 ---
 description: UI changes must follow ui-ux-pro-max skill and DANORA design system
-globs: apps/web/**/*
+globs: apps/frontend/**/*
 alwaysApply: false
 ---
 
