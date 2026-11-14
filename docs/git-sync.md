@@ -57,6 +57,24 @@ export HTTP_PROXY=http://127.0.0.1:PORT
 git push origin main
 ```
 
+## عیب‌یابی `Permission denied (publickey)`
+
+اتصال SSH برقرار است ولی GitHub کلید را نمی‌شناسد:
+
+```bash
+ssh-keygen -lf ~/.ssh/id_ed25519.pub
+ssh -T git@github.com
+```
+
+کلید فعلی این ماشین (فقط **محتوای** `id_ed25519.pub` را در GitHub بگذار، نه فایل خصوصی):
+
+```
+# خروجی دستور:
+# cat ~/.ssh/id_ed25519.pub
+```
+
+اگر تازه کلید ساخته‌ای، حتماً **همان** کلید عمومی جدید را در GitHub ثبت کن؛ کلیدهای قدیمی حذف‌شده دیگر کار نمی‌کنند.
+
 ## وضعیت فعلی این مخزن
 
 روی این ماشین `origin` روی **SSH** تنظیم شده است. تا کلید `~/.ssh/id_ed25519.pub` در GitHub ثبت نشود، `git push` با `Permission denied (publickey)` مواجه می‌شود — این خطای احراز هویت است، نه timeout.
