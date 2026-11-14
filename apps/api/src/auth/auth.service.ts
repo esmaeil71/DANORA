@@ -3,7 +3,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,7 +13,6 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private config: ConfigService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -45,12 +43,6 @@ export class AuthService {
   }
 
   signToken(sub: string, email: string) {
-    return this.jwt.sign(
-      { sub, email },
-      {
-        secret: this.config.get<string>('JWT_SECRET') ?? 'dev-secret',
-        expiresIn: this.config.get<string>('JWT_EXPIRES_IN') ?? '7d',
-      },
-    );
+    return this.jwt.sign({ sub, email });
   }
 }
