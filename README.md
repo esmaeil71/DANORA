@@ -34,3 +34,5 @@ docker compose --profile stack up -d
 ```
 
 معماری: [`docs/architecture.md`](docs/architecture.md)
+
+مشکل `git push` / timeout: [`docs/git-sync.md`](docs/git-sync.md)
