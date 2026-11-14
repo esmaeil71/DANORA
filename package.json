@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run --parallel dev:api dev:web",
+    "dev": "pnpm --filter @danora/shared build && pnpm --filter @danora/api --filter @danora/web --parallel dev",
     "dev:api": "pnpm --filter @danora/api dev",
     "dev:web": "pnpm --filter @danora/web dev",
     "build": "pnpm run -r build",
