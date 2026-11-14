@@ -12,15 +12,11 @@
 
 ```bash
 cp .env.example .env
-# کلیدهای API را در .env تنظیم کنید
+# کلیدهای API را در .env تنظیم کنید (فقط ریشه پروژه — با pnpm dev خودکار به api/web کپی می‌شود)
 
 docker compose up -d postgres redis
 
-cd apps/api
-pnpm exec prisma migrate deploy
-pnpm exec prisma db seed
-
-cd ../..
+pnpm db:setup
 pnpm dev
 ```
 

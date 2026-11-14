@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { resolve } from 'node:path';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { ConversationsModule } from './conversations/conversations.module';
@@ -9,7 +10,15 @@ import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [
+        resolve(process.cwd(), '.env'),
+        resolve(process.cwd(), '.env.local'),
+        resolve(process.cwd(), '../../.env'),
+        resolve(process.cwd(), '../../.env.local'),
+      ],
+    }),
     PrismaModule,
     RedisModule,
     AuthModule,

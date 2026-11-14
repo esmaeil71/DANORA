@@ -12,12 +12,19 @@ export async function api<T = unknown>(
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    credentials: "include",
-    headers,
-    body: init.json !== undefined ? JSON.stringify(init.json) : init.body,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...init,
+      credentials: "include",
+      headers,
+      body: init.json !== undefined ? JSON.stringify(init.json) : init.body,
+    });
+  } catch {
+    throw new Error(
+      `اتصال به API برقرار نشد (${API_URL}). آیا سرور با pnpm dev:api روی پورت ۴۰۰۰ در حال اجراست؟`,
+    );
+  }
 
   if (!res.ok) {
     let message = res.statusText;

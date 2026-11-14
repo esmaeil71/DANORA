@@ -3,6 +3,8 @@ dist
 .next
 .env
 .env.local
+apps/api/.env
+apps/web/.env.local
 *.log
 coverage
 .turbo

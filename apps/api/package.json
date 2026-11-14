@@ -10,7 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "pnpm run dev:prepare && nest start --watch",
-    "dev:prepare": "pnpm exec prisma generate && pnpm --filter @danora/shared build",
+    "dev:prepare": "pnpm exec prisma generate && pnpm --filter @danora/shared build && rm -rf dist tsconfig.build.tsbuildinfo",
     "start:dev": "nest start --watch",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

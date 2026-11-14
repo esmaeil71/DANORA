@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @danora/shared build && pnpm --filter @danora/api --filter @danora/web --parallel dev",
+    "dev": "pnpm --filter @danora/shared build && node scripts/sync-dev-env.mjs && pnpm --filter @danora/api --filter @danora/web --parallel dev",
     "dev:api": "pnpm --filter @danora/api dev",
     "dev:web": "pnpm --filter @danora/web dev",
     "build": "pnpm run -r build",
-    "db:migrate": "pnpm --filter @danora/api prisma:migrate",
-    "db:seed": "pnpm --filter @danora/api prisma:seed"
+    "db:setup": "node scripts/sync-dev-env.mjs && pnpm --filter @danora/api exec prisma migrate deploy && pnpm --filter @danora/api exec prisma db seed",
+    "db:migrate": "pnpm --filter @danora/api exec prisma migrate deploy",
+    "db:seed": "pnpm --filter @danora/api exec prisma db seed"
   }
 }
