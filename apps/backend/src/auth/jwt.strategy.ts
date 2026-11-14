@@ -3,7 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { isConfiguredAdmin } from './admin-emails';
 
 export type JwtPayload = { sub: string; email: string };
 
@@ -21,7 +23,7 @@ function cookieExtractor(req: Request): string | null {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    config: ConfigService,
+    private readonly config: ConfigService,
     private prisma: PrismaService,
   ) {
     super({
@@ -38,10 +40,25 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
+    if (user.suspended) {
+      throw new UnauthorizedException('حساب کاربری مسدود شده است');
+    }
+
+    let role = user.role;
+    if (isConfiguredAdmin(this.config, user.email) && user.role !== UserRole.admin) {
+      const updated = await this.prisma.user.update({
+        where: { id: user.id },
+        data: { role: UserRole.admin },
+      });
+      role = updated.role;
+    }
+
     return {
       id: user.id,
       email: user.email,
       plan: user.plan,
+      role,
+      suspended: user.suspended,
       createdAt: user.createdAt,
     };
   }

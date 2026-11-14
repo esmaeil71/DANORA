@@ -1,34 +1,55 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { isConfiguredAdmin } from './admin-emails';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
+    private config: ConfigService,
   ) {}
 
+  private async bootstrapAdminRole(userId: string, email: string) {
+    if (!isConfiguredAdmin(this.config, email)) {
+      return;
+    }
+    await this.prisma.user.updateMany({
+      where: { id: userId, role: UserRole.user },
+      data: { role: UserRole.admin },
+    });
+  }
+
   async register(dto: RegisterDto) {
+    const email = dto.email.toLowerCase();
     const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email.toLowerCase() },
+      where: { email },
     });
     if (existing) {
       throw new ConflictException('این ایمیل قبلاً ثبت شده است');
     }
     const passwordHash = await bcrypt.hash(dto.password, 12);
+    const role = isConfiguredAdmin(this.config, email)
+      ? UserRole.admin
+      : UserRole.user;
     const user = await this.prisma.user.create({
       data: {
-        email: dto.email.toLowerCase(),
+        email,
         passwordHash,
+        role,
       },
     });
+    await this.bootstrapAdminRole(user.id, user.email);
     return this.signToken(user.id, user.email);
   }
 
@@ -39,6 +60,10 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) {
       throw new UnauthorizedException('ایمیل یا رمز عبور نادرست است');
     }
+    if (user.suspended) {
+      throw new ForbiddenException('حساب کاربری مسدود شده است');
+    }
+    await this.bootstrapAdminRole(user.id, user.email);
     return this.signToken(user.id, user.email);
   }
 

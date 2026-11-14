@@ -1,5 +1,5 @@
-/* تم چت شبیه GapGPT — فقط داخل .chat-gapgpt */
-.chat-gapgpt {
+/* تم تیره چت — فقط داخل .chat-dark */
+.chat-dark {
   --chat-bg: #0f0f10;
   --chat-surface: #18181b;
   --chat-surface-hover: #27272a;
@@ -14,6 +14,6 @@
   background: var(--chat-bg);
 }
 
-.chat-gapgpt ::selection {
+.chat-dark ::selection {
   background: rgb(139 92 246 / 0.35);
 }

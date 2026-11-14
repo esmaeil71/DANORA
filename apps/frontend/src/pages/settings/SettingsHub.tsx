@@ -1,16 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  BookOpen,
   Code2,
   CreditCard,
   Gauge,
   Headphones,
   LogOut,
   Palette,
+  Shield,
   UserCircle2,
 } from "lucide-react";
 import { api } from "@/lib/api";
-import { displayLabel, loadUserPrefs } from "@/lib/user-prefs";
+import { displayLabel, fetchAndCacheUserPrefs, loadUserPrefs } from "@/lib/user-prefs";
 import { SettingsMenuItem } from "@/components/settings/settings-menu-item";
 import { SettingsLoading } from "@/components/settings/settings-loading";
 import { useSettingsSession } from "@/hooks/use-settings-session";
@@ -18,7 +20,11 @@ import { useSettingsSession } from "@/hooks/use-settings-session";
 export function SettingsHub() {
   const navigate = useNavigate();
   const { user, usage, loading } = useSettingsSession();
-  const prefs = loadUserPrefs();
+  const [prefs, setPrefs] = useState(loadUserPrefs);
+
+  useEffect(() => {
+    void fetchAndCacheUserPrefs().then(setPrefs);
+  }, []);
 
   const logout = useCallback(async () => {
     await api("/auth/logout", { method: "POST" });
@@ -121,6 +127,25 @@ export function SettingsHub() {
         </div>
       </section>
 
+      {user?.role === "admin" && (
+        <section aria-labelledby="admin-heading">
+          <h2
+            id="admin-heading"
+            className="text-xs font-medium text-[var(--st-muted)] mb-2 px-1"
+          >
+            مدیریت سامانه
+          </h2>
+          <div className="rounded-2xl border border-violet-500/30 bg-violet-500/5 overflow-hidden">
+            <SettingsMenuItem
+              icon={<Shield className="size-5" />}
+              label="پنل ادمین"
+              description="کاربران، درخواست‌ها و مدل‌ها"
+              href="/settings/admin"
+            />
+          </div>
+        </section>
+      )}
+
       <section aria-labelledby="more-heading">
         <h2
           id="more-heading"
@@ -129,17 +154,23 @@ export function SettingsHub() {
           بیشتر
         </h2>
         <div className="rounded-2xl border border-[var(--st-border)] bg-[var(--st-surface)] overflow-hidden divide-y divide-[var(--st-border)]">
-          <SettingsMenuItem
-            icon={<Code2 className="size-5" />}
-            label="پلتفرم توسعه‌دهندگان"
-            description="آدرس API و نمونه درخواست"
-            href="/settings/developer"
-          />
+            <SettingsMenuItem
+              icon={<Code2 className="size-5" />}
+              label="پلتفرم توسعه‌دهندگان"
+              description="کلید API، مستندات و نمونه cURL"
+              href="/settings/developer"
+            />
           <SettingsMenuItem
             icon={<Headphones className="size-5" />}
             label="پشتیبانی"
-            description="راهنما و تماس"
+            description="تیکت، FAQ و ایمیل"
             href="/settings/support"
+          />
+          <SettingsMenuItem
+            icon={<BookOpen className="size-5" />}
+            label="درباره دانورا"
+            description="معرفی، قوانین و نسخه"
+            href="/settings/about"
           />
         </div>
       </section>

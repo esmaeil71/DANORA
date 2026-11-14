@@ -12,6 +12,11 @@ enum UserPlan {
   pro
 }
 
+enum UserRole {
+  user
+  admin
+}
+
 enum MessageRole {
   user
   assistant
@@ -29,12 +34,61 @@ model User {
   email        String   @unique
   passwordHash String   @map("password_hash")
   plan         UserPlan @default(free)
+  role         UserRole @default(user)
+  suspended    Boolean  @default(false)
+  preferences  Json?    @map("preferences")
   createdAt    DateTime @default(now()) @map("created_at")
 
   conversations Conversation[]
   usageDaily    UsageDaily[]
+  apiTokens     ApiToken[]
+  upgradeRequests UpgradeRequest[]
+  supportInquiries SupportInquiry[]
 
   @@map("users")
+}
+
+model ApiToken {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  name       String
+  tokenHash  String    @map("token_hash")
+  prefix     String
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastUsedAt DateTime? @map("last_used_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("api_tokens")
+}
+
+model UpgradeRequest {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  note      String?  @db.Text
+  phone     String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("upgrade_requests")
+}
+
+model SupportInquiry {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  subject   String
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("support_inquiries")
 }
 
 model Conversation {

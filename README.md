@@ -19,6 +19,8 @@ npm run dev
 - `docker compose up -d` — PostgreSQL و Redis
 - `npm run dev` — backend و frontend با هم (پورت‌های ۴۰۰۰ و ۳۰۰۰)
 
+**پنل ادمین:** در `.env` مقدار `ADMIN_EMAILS` را با ایمیل خود تنظیم کنید، یک‌بار دوباره وارد شوید، سپس از تنظیمات → **پنل ادمین** یا مسیر `/settings/admin`.
+
 | دستور | توضیح |
 |--------|--------|
 | `npm install` | وابستگی‌های همه workspaceها |

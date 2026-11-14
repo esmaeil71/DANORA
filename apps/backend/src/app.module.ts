@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { resolve } from 'node:path';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
+import { SettingsModule } from './settings/settings.module';
+import { AdminModule } from './admin/admin.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { ModelsModule } from './models/models.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -25,6 +27,8 @@ import { RedisModule } from './redis/redis.module';
     ModelsModule,
     ConversationsModule,
     ChatModule,
+    SettingsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

@@ -69,15 +69,19 @@ export class AuthController {
         id: string;
         email: string;
         plan: string;
+        role: string;
+        suspended?: boolean;
         createdAt?: Date;
       };
     },
   ) {
-    const { id, email, plan, createdAt } = req.user;
+    const { id, email, plan, role, suspended, createdAt } = req.user;
     return {
       id,
       email,
       plan,
+      role,
+      suspended: suspended ?? false,
       ...(createdAt && {
         createdAt:
           createdAt instanceof Date

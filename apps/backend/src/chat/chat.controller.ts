@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Post,
   Req,
   Res,
@@ -12,7 +13,7 @@ import { ChatCompletionDto } from './dto/chat.dto';
 import { ChatService } from './chat.service';
 
 type AuthRequest = Request & {
-  user: { id: string; email: string; plan: string };
+  user: { id: string; email: string; plan: string; suspended?: boolean };
 };
 
 @Controller('chat')
@@ -36,6 +37,9 @@ export class ChatController {
     };
 
     try {
+      if (req.user.suspended) {
+        throw new ForbiddenException('حساب کاربری مسدود شده است');
+      }
       const conversation = await this.chat.prepareConversation(
         req.user.id,
         dto.conversationId,

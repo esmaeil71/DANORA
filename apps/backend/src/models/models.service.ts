@@ -49,4 +49,31 @@ export class ModelsService {
 
     return models;
   }
+
+  async invalidateEnabledCache() {
+    try {
+      await this.redis.client.connect();
+      await this.redis.client.del(CACHE_KEY);
+    } catch {
+      /* Redis optional */
+    }
+  }
+
+  async listAllForAdmin() {
+    return this.prisma.modelCatalog.findMany({
+      orderBy: { displayName: 'asc' },
+    });
+  }
+
+  async updateForAdmin(
+    id: string,
+    data: { enabled?: boolean; displayName?: string },
+  ) {
+    const row = await this.prisma.modelCatalog.update({
+      where: { id },
+      data,
+    });
+    await this.invalidateEnabledCache();
+    return row;
+  }
 }

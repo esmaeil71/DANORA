@@ -24,6 +24,7 @@ export function ChatSidebar({
   onSelect,
   onRemove,
   onLogout,
+  compact = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -35,7 +36,11 @@ export function ChatSidebar({
   onSelect: (id: string) => void;
   onRemove: (id: string, e: MouseEvent) => void;
   onLogout: () => void;
+  compact?: boolean;
 }) {
+  const rowClass = compact
+    ? "min-h-8 py-1.5 text-xs"
+  : "min-h-10 py-2 text-sm";
   return (
     <>
       <button
@@ -57,7 +62,7 @@ export function ChatSidebar({
       )}
 
       <aside
-        className={`chat-gapgpt-sidebar fixed md:relative z-30 md:z-auto inset-y-0 right-0 w-[min(100%,280px)] flex flex-col border-l border-[var(--chat-border)] bg-[var(--chat-surface)] transition-transform duration-200 md:translate-x-0 ${
+        className={`chat-sidebar-panel fixed md:relative z-30 md:z-auto inset-y-0 right-0 w-[min(100%,280px)] flex flex-col border-l border-[var(--chat-border)] bg-[var(--chat-surface)] transition-transform duration-200 md:translate-x-0 ${
           open ? "translate-x-0" : "translate-x-full md:translate-x-0"
         }`}
       >
@@ -104,7 +109,7 @@ export function ChatSidebar({
                   onSelect(c.id);
                   onClose();
                 }}
-                className={`w-full text-right min-h-10 px-3 py-2 rounded-lg text-sm truncate cursor-pointer transition-colors duration-200 ${
+                className={`w-full text-right px-3 rounded-lg truncate cursor-pointer transition-colors duration-200 ${rowClass} ${
                   activeId === c.id
                     ? "bg-[var(--chat-surface-hover)] text-[var(--chat-text)]"
                     : "text-[var(--chat-muted)] hover:bg-[var(--chat-surface-hover)] hover:text-[var(--chat-text)]"

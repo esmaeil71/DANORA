@@ -10,15 +10,24 @@ const titles: Record<string, string> = {
   "/settings/billing": "بسته و پرداخت",
   "/settings/developer": "توسعه‌دهندگان",
   "/settings/support": "پشتیبانی",
+  "/settings/about": "درباره دانورا",
+  "/settings/admin": "مدیریت",
+  "/settings/admin/users": "کاربران",
+  "/settings/admin/requests": "درخواست‌ها",
+  "/settings/admin/models": "مدل‌ها",
 };
 
 export function SettingsShell() {
   const { pathname } = useLocation();
-  const title = titles[pathname] ?? "تنظیمات";
+  const title =
+    titles[pathname] ??
+    (pathname.startsWith("/settings/admin/users/")
+      ? "جزئیات کاربر"
+      : "تنظیمات");
   const backTo = pathname === "/settings" ? "/chat" : "/settings";
 
   return (
-    <div className="settings-gapgpt min-h-[100dvh]">
+    <div className="settings-dark min-h-[100dvh]">
       <header className="sticky top-0 z-10 border-b border-[var(--st-border)]/80 bg-[var(--st-bg)]/90 backdrop-blur-md">
         <div className="max-w-xl mx-auto h-14 px-4 flex items-center justify-between gap-3">
           <Link

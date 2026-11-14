@@ -1,0 +1,14 @@
+.chat-light {
+  --chat-bg: #f4f4f5;
+  --chat-surface: #ffffff;
+  --chat-surface-hover: #f4f4f5;
+  --chat-border: #e4e4e7;
+  --chat-text: #18181b;
+  --chat-muted: #71717a;
+  --chat-input-bg: #fafafa;
+  --chat-user: #e4e4e7;
+  --chat-accent: #7c3aed;
+  --chat-accent-hover: #6d28d9;
+  color: var(--chat-text);
+  background: var(--chat-bg);
+}

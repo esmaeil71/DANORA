@@ -1,6 +1,6 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { loadUserPrefs, saveUserPrefs } from "@/lib/user-prefs";
+import { useUserPrefs } from "@/hooks/use-user-prefs";
 import {
   SettingsFieldRow,
   SettingsInput,
@@ -11,28 +11,36 @@ import { useSettingsSession } from "@/hooks/use-settings-session";
 
 export function SettingsProfilePage() {
   const { user, loading } = useSettingsSession();
-  const [displayName, setDisplayName] = useState(() => loadUserPrefs().displayName);
+  const { prefs, update } = useUserPrefs(true);
+  const [displayName, setDisplayName] = useState("");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    setDisplayName(prefs.displayName);
+  }, [prefs.displayName]);
+
   if (loading) return <SettingsLoading />;
 
-  function onSave(e: FormEvent) {
+  async function onSave(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
-    saveUserPrefs({ displayName: displayName.trim() });
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      await update({ displayName: displayName.trim() });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
     <main className="max-w-xl mx-auto px-4 py-6 pb-12 space-y-6">
       <SettingsPanel title="پروفایل عمومی">
-        <form onSubmit={onSave}>
+        <form onSubmit={(e) => void onSave(e)}>
           <SettingsFieldRow
             label="نام نمایشی"
-            hint="در سایدبار چت و کارت حساب نشان داده می‌شود (فقط روی این دستگاه)"
+            hint="در سایدبار چت و کارت حساب نمایش داده می‌شود"
           >
             <SettingsInput
               value={displayName}

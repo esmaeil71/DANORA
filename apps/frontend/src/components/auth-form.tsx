@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
+import { fetchAndCacheUserPrefs } from "@/lib/user-prefs";
 import { SiteHeader } from "@/components/site-header";
 
 type Mode = "login" | "register";
@@ -19,6 +20,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setLoading(true);
     try {
       await api(`/auth/${mode}`, { method: "POST", json: { email, password } });
+      await fetchAndCacheUserPrefs().catch(() => undefined);
       navigate("/chat");
     } catch (err) {
       setError(err instanceof Error ? err.message : "خطا");

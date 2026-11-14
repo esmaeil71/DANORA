@@ -3,11 +3,13 @@ export function SettingsToggle({
   onChange,
   label,
   description,
+  disabled,
 }: {
   checked: boolean;
   onChange: (v: boolean) => void;
   label: string;
   description?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-4 border-b border-[var(--st-border)] last:border-0">
@@ -21,8 +23,9 @@ export function SettingsToggle({
         type="button"
         role="switch"
         aria-checked={checked}
+        disabled={disabled}
         onClick={() => onChange(!checked)}
-        className={`relative shrink-0 w-12 h-7 rounded-full transition-colors duration-200 cursor-pointer ${
+        className={`relative shrink-0 w-12 h-7 rounded-full transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
           checked ? "bg-violet-600" : "bg-[var(--st-surface-hover)]"
         }`}
       >

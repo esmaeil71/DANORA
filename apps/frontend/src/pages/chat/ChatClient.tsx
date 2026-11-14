@@ -14,11 +14,15 @@ import {
   streamChat,
   UserMe,
 } from "@/lib/api";
+import { useUserPrefs } from "@/hooks/use-user-prefs";
+import { loadUserPrefs } from "@/lib/user-prefs";
 
 type LocalMessage = MessageRow & { streaming?: boolean };
 
 export function ChatClient() {
   const navigate = useNavigate();
+  const { prefs } = useUserPrefs(true);
+  const themeClass = prefs.chatTheme === "light" ? "chat-light" : "chat-dark";
   const [user, setUser] = useState<UserMe | null>(null);
   const [models, setModels] = useState<ModelRow[]>([]);
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
@@ -53,7 +57,12 @@ export function ChatClient() {
         if (cancelled) return;
         setModels(modelList);
         setConversations(convList);
-        setModelId(modelList[0]?.id ?? "");
+        const preferred = loadUserPrefs().defaultModelId;
+        const initial =
+          preferred && modelList.some((m) => m.id === preferred)
+            ? preferred
+            : (modelList[0]?.id ?? "");
+        setModelId(initial);
       } catch {
         navigate("/login", { replace: true });
       } finally {
@@ -183,7 +192,7 @@ export function ChatClient() {
 
   if (loading) {
     return (
-      <div className="chat-gapgpt min-h-screen flex items-center justify-center gap-2 text-[var(--chat-muted)]">
+      <div className={`${themeClass} min-h-screen flex items-center justify-center gap-2 text-[var(--chat-muted)]`}>
         <Loader2 className="size-5 animate-spin" aria-hidden />
         در حال بارگذاری…
       </div>
@@ -191,8 +200,9 @@ export function ChatClient() {
   }
 
   return (
-    <div className="chat-gapgpt h-[100dvh] flex overflow-hidden">
+    <div className={`${themeClass} h-[100dvh] flex overflow-hidden`}>
       <ChatSidebar
+        compact={prefs.density === "compact"}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onToggle={() => setSidebarOpen((v) => !v)}

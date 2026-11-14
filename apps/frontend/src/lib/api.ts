@@ -54,10 +54,14 @@ export async function api<T = unknown>(
   return JSON.parse(text) as T;
 }
 
+export type UserRole = "user" | "admin";
+
 export interface UserMe {
   id: string;
   email: string;
   plan: string;
+  role: UserRole;
+  suspended?: boolean;
   createdAt?: string;
 }
 
