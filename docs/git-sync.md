@@ -7,8 +7,17 @@
 پورت ۲۲ اغلب پایدارتر از HTTPS است.
 
 ```bash
-# افزودن کلید GitHub به known_hosts (یک‌بار)
-ssh-keyscan -t ed25519,rsa github.com >> ~/.ssh/known_hosts
+# اگر پورت ۲۲ timeout می‌دهد، SSH روی ۴۴۳ (در ~/.ssh/config)
+cat >> ~/.ssh/config <<'EOF'
+Host github.com
+  HostName ssh.github.com
+  Port 443
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+EOF
+chmod 600 ~/.ssh/config
+ssh-keyscan -p 443 -t ed25519,rsa ssh.github.com >> ~/.ssh/known_hosts
 
 # remote روی SSH
 git remote set-url origin git@github.com:esmaeil71/DANORA.git
