@@ -1,0 +1,15 @@
+---
+description: UI changes must follow ui-ux-pro-max skill and DANORA design system
+globs: apps/web/**/*
+alwaysApply: false
+---
+
+# UI/UX برای DANORA
+
+1. قبل از طراحی صفحه جدید: بخوانید `design-system/danora/MASTER.md` و در صورت وجود `design-system/danora/pages/<page>.md`.
+2. برای راهنمای جامع از skill پروژه استفاده کنید: `.cursor/skills/ui-ux-pro-max/SKILL.md`.
+3. جستجوی طراحی (در صورت نیاز):
+   ```bash
+   python3 .cursor/skills/ui-ux-pro-max/scripts/search.py "<query>" --domain ux
+   ```
+4. چک‌لیست: کنتراست 4.5:1، focus visible، حداقل 44×44 برای لمس، بدون emoji به‌جای آیکون، `cursor-pointer` روی عناصر کلیکی، `prefers-reduced-motion`.

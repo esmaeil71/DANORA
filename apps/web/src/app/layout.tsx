@@ -5,6 +5,7 @@ import "./globals.css";
 const vazir = Vazirmatn({
   subsets: ["arabic"],
   variable: "--font-vazir",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <body className={`${vazir.variable} font-sans antialiased`}>{children}</body>
+      <body className={`${vazir.variable} font-sans antialiased min-h-screen`}>
+        {children}
+      </body>
     </html>
   );
 }

@@ -45,6 +45,19 @@ pnpm dev
 
 معماری و تصمیم‌های محصول: [`docs/architecture.md`](docs/architecture.md)
 
+## UI/UX (ui-ux-pro-max)
+
+Skill پروژه: [`.cursor/skills/ui-ux-pro-max/`](.cursor/skills/ui-ux-pro-max/) (منبع: [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill))
+
+- Design system ذخیره‌شده: [`design-system/danora/MASTER.md`](design-system/danora/MASTER.md)
+- قانون Cursor: [`.cursor/rules/ui-design.mdc`](.cursor/rules/ui-design.mdc)
+
+بازتولید پیشنهاد طراحی:
+
+```bash
+python3 .cursor/skills/ui-ux-pro-max/scripts/search.py "AI chat SaaS" --design-system -p "DANORA" --output-dir .
+```
+
 ## ساختار
 
 - `apps/web` — Next.js (فارسی، RTL)
