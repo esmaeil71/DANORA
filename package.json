@@ -8,7 +8,7 @@
     "packages/shared"
   ],
   "scripts": {
-    "postinstall": "npm run build -w @danora/shared",
+    "postinstall": "npm run build -w @danora/shared && npm exec -w @danora/backend prisma generate",
     "dev": "node scripts/dev.mjs",
     "dev:backend": "npm run dev -w @danora/backend",
     "dev:frontend": "npm run dev -w @danora/frontend",

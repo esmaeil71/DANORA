@@ -1,28 +1,25 @@
-"use client";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ArrowRight, User } from "lucide-react";
 import { api, UserMe } from "@/lib/api";
 import { SiteHeader } from "@/components/site-header";
 
-export default function SettingsPage() {
-  const router = useRouter();
+export function SettingsPage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<UserMe | null>(null);
 
   useEffect(() => {
     api<UserMe>("/auth/me")
       .then(setUser)
-      .catch(() => router.replace("/login"));
-  }, [router]);
+      .catch(() => navigate("/login", { replace: true }));
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="max-w-lg mx-auto px-4 sm:px-6 py-10">
         <Link
-          href="/chat"
+          to="/chat"
           className="min-h-11 inline-flex items-center gap-2 text-primary text-sm cursor-pointer hover:underline"
         >
           <ArrowRight className="size-4" aria-hidden />

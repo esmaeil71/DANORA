@@ -2,7 +2,7 @@
 
 ```
 apps/backend/   — API (NestJS)
-apps/frontend/  — UI (Next.js)
+apps/frontend/  — UI (Vite + React)
 packages/shared/
 ```
 

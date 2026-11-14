@@ -1,7 +1,4 @@
-"use client";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
@@ -10,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 type Mode = "login" | "register";
 
 export function AuthForm({ mode }: { mode: Mode }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +19,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setLoading(true);
     try {
       await api(`/auth/${mode}`, { method: "POST", json: { email, password } });
-      router.push("/chat");
-      router.refresh();
+      navigate("/chat");
     } catch (err) {
       setError(err instanceof Error ? err.message : "خطا");
     } finally {
@@ -104,7 +100,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <p className="mt-6 text-sm text-muted-foreground text-center">
             {mode === "login" ? "حساب ندارید؟" : "قبلاً ثبت‌نام کرده‌اید؟"}{" "}
             <Link
-              href={`/${other}`}
+              to={`/${other}`}
               className="text-primary font-medium cursor-pointer hover:underline"
             >
               {otherLabel}

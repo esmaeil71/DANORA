@@ -6,7 +6,7 @@
 DANORA/
 ├── apps/
 │   ├── backend/      # NestJS — API، Auth، Model Router
-│   └── frontend/     # Next.js — UI فارسی / چت
+│   └── frontend/     # Vite + React — UI فارسی / چت
 ├── packages/shared/  # تایپ‌های مشترک
 ├── docker/
 ├── scripts/

@@ -1,7 +1,5 @@
-"use client";
-
 import type { MouseEvent } from "react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import {
   LogOut,
   Menu,
@@ -64,7 +62,7 @@ export function ChatSidebar({
       >
         <div className="p-3 border-b border-[var(--chat-border)] flex items-center gap-2">
           <Link
-            href="/"
+            to="/"
             className="flex items-center gap-2 font-semibold text-[var(--chat-text)] min-h-11 px-1 cursor-pointer"
           >
             <Sparkles className="size-5 text-[var(--chat-accent)]" aria-hidden />
@@ -132,7 +130,7 @@ export function ChatSidebar({
             </p>
           )}
           <Link
-            href="/settings"
+            to="/settings"
             className="flex items-center gap-2 min-h-10 px-2 rounded-lg hover:bg-[var(--chat-surface-hover)] text-[var(--chat-text)] cursor-pointer"
           >
             <Settings className="size-4" aria-hidden />

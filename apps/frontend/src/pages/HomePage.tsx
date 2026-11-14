@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import {
   Bot,
   Layers,
@@ -27,7 +27,7 @@ const features = [
   },
 ];
 
-export default function Home() {
+export function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -47,14 +47,14 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              href="/register"
+              to="/register"
               className="min-h-12 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 rounded-xl bg-accent text-white font-semibold cursor-pointer transition-all duration-200 hover:brightness-110"
             >
               <MessageSquare className="size-5" aria-hidden />
               شروع رایگان
             </Link>
             <Link
-              href="/login"
+              to="/login"
               className="min-h-12 w-full sm:w-auto inline-flex items-center justify-center px-8 rounded-xl border border-border bg-card text-foreground font-medium cursor-pointer transition-colors duration-200 hover:bg-muted"
             >
               ورود
@@ -95,7 +95,7 @@ export default function Home() {
                 تجربه‌ای که از پلتفرم‌های بین‌المللی انتظار دارید.
               </p>
               <Link
-                href="/chat"
+                to="/chat"
                 className="mt-6 min-h-11 inline-flex items-center px-6 rounded-lg bg-primary text-white font-medium cursor-pointer transition-opacity duration-200 hover:opacity-90"
               >
                 رفتن به چت

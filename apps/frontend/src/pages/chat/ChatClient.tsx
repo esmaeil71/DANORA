@@ -1,7 +1,5 @@
-"use client";
-
 import type { MouseEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { ChatComposer } from "@/components/chat/chat-composer";
@@ -20,7 +18,7 @@ import {
 type LocalMessage = MessageRow & { streaming?: boolean };
 
 export function ChatClient() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [user, setUser] = useState<UserMe | null>(null);
   const [models, setModels] = useState<ModelRow[]>([]);
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
@@ -57,7 +55,7 @@ export function ChatClient() {
         setConversations(convList);
         setModelId(modelList[0]?.id ?? "");
       } catch {
-        router.replace("/login");
+        navigate("/login", { replace: true });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -65,7 +63,7 @@ export function ChatClient() {
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [navigate]);
 
   useEffect(() => {
     if (messages.length) scrollDown();
@@ -178,7 +176,7 @@ export function ChatClient() {
 
   async function logout() {
     await api("/auth/logout", { method: "POST" });
-    router.push("/");
+    navigate("/");
   }
 
   const currentModel = models.find((m) => m.id === modelId);

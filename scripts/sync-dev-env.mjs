@@ -20,20 +20,25 @@ if (!existsSync(envPath)) {
 const content = readFileSync(envPath, "utf8");
 writeFileSync(join(root, "apps/backend/.env"), content);
 
+const apiUrl =
+  pick(content, "VITE_API_URL") ??
+  pick(content, "NEXT_PUBLIC_API_URL") ??
+  "http://localhost:4000";
+
 const webEnv = content
   .split("\n")
   .filter((line) => {
     const t = line.trim();
     return (
+      t.startsWith("VITE_") ||
       t.startsWith("NEXT_PUBLIC_") ||
-      (t.startsWith("#") && line.includes("Next")) ||
+      (t.startsWith("#") && /vite|next|frontend/i.test(line)) ||
       t === ""
     );
   })
   .join("\n");
 
-const apiUrl = pick(content, "NEXT_PUBLIC_API_URL") ?? "http://localhost:4000";
-const frontendEnv = `${webEnv.trim()}\nNEXT_PUBLIC_API_URL=${apiUrl}\n`;
+const frontendEnv = `${webEnv.trim()}\nVITE_API_URL=${apiUrl}\n`;
 
 writeFileSync(join(root, "apps/frontend/.env.local"), frontendEnv);
 
