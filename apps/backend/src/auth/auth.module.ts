@@ -9,9 +9,11 @@ import { UsageModule } from '../usage/usage.module';
 import { DeveloperModule } from '../developer/developer.module';
 import { DeveloperController } from '../developer/developer.controller';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     DeveloperModule,
     UsageModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),

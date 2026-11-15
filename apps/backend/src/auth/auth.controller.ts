@@ -11,7 +11,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, LoginDto, RegisterDto } from './dto/auth.dto';
+import {
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dto/auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsageService } from '../usage/usage.service';
 
@@ -91,6 +97,16 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   getUsageDaily(@Req() req: Request & { user: { id: string; plan: string } }) {
     return this.usageService.getDailySummary(req.user.id);
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.auth.requestPasswordReset(dto.email);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.auth.resetPasswordWithToken(dto.token, dto.newPassword);
   }
 
   @Patch('password')

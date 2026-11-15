@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FormEvent, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
@@ -9,6 +9,8 @@ type Mode = "login" | "register";
 
 export function AuthForm({ mode }: { mode: Mode }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const flashMessage = (location.state as { message?: string } | null)?.message;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
               : "حساب رایگان بسازید و چت را شروع کنید"}
           </p>
 
+          {flashMessage && mode === "login" && (
+            <p className="text-sm text-emerald-600 mb-2" role="status">
+              {flashMessage}
+            </p>
+          )}
+
           <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
             <div className="flex flex-col gap-1.5 text-sm">
               <label htmlFor="email">ایمیل</label>
@@ -78,6 +86,16 @@ export function AuthForm({ mode }: { mode: Mode }) {
                 dir="ltr"
               />
               <p className="text-xs text-muted-foreground">حداقل ۸ کاراکتر</p>
+              {mode === "login" && (
+                <p className="text-xs text-right mt-1">
+                  <Link
+                    to="/forgot-password"
+                    className="text-primary hover:underline"
+                  >
+                    رمز عبور را فراموش کرده‌اید؟
+                  </Link>
+                </p>
+              )}
             </div>
 
             {error && (

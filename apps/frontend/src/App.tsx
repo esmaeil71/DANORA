@@ -1,6 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ChatPage } from "./pages/ChatPage";
 import { SettingsShell } from "./components/settings/settings-shell";
@@ -24,6 +26,8 @@ export function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/settings" element={<SettingsShell />}>
