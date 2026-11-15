@@ -9,6 +9,11 @@
   --chat-user: #e4e4e7;
   --chat-accent: #7c3aed;
   --chat-accent-hover: #6d28d9;
+  --chat-scrollbar-size: 6px;
+  --chat-scrollbar-track: transparent;
+  --chat-scrollbar-thumb: rgb(113 113 122 / 0.28);
+  --chat-scrollbar-thumb-hover: rgb(124 58 237 / 0.45);
+  --chat-scrollbar-thumb-active: rgb(124 58 237 / 0.65);
   color: var(--chat-text);
   background: var(--chat-bg);
 }

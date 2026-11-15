@@ -15,6 +15,7 @@ export function SettingsProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     setDisplayName(prefs.displayName);
@@ -25,10 +26,13 @@ export function SettingsProfilePage() {
   async function onSave(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setErr(null);
     try {
       await update({ displayName: displayName.trim() });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "ذخیره نشد");
     } finally {
       setSaving(false);
     }
@@ -53,6 +57,11 @@ export function SettingsProfilePage() {
             <SettingsInput value={user?.email ?? ""} disabled dir="ltr" />
           </SettingsFieldRow>
           <div className="px-4 py-4 border-t border-[var(--st-border)]">
+            {err && (
+              <p className="text-sm text-red-400 mb-3" role="alert">
+                {err}
+              </p>
+            )}
             {saved && (
               <p className="text-sm text-emerald-400 mb-3" role="status">
                 ذخیره شد

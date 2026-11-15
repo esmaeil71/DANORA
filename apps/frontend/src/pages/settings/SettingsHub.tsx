@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import {
   BookOpen,
   Code2,
@@ -12,7 +12,8 @@ import {
   UserCircle2,
 } from "lucide-react";
 import { api } from "@/lib/api";
-import { displayLabel, fetchAndCacheUserPrefs, loadUserPrefs } from "@/lib/user-prefs";
+import { displayLabel } from "@/lib/user-prefs";
+import { useUserPrefs } from "@/hooks/use-user-prefs";
 import { SettingsMenuItem } from "@/components/settings/settings-menu-item";
 import { SettingsLoading } from "@/components/settings/settings-loading";
 import { useSettingsSession } from "@/hooks/use-settings-session";
@@ -20,11 +21,7 @@ import { useSettingsSession } from "@/hooks/use-settings-session";
 export function SettingsHub() {
   const navigate = useNavigate();
   const { user, usage, loading } = useSettingsSession();
-  const [prefs, setPrefs] = useState(loadUserPrefs);
-
-  useEffect(() => {
-    void fetchAndCacheUserPrefs().then(setPrefs);
-  }, []);
+  const { prefs } = useUserPrefs(true);
 
   const logout = useCallback(async () => {
     await api("/auth/logout", { method: "POST" });

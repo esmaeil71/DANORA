@@ -14,11 +14,12 @@ import { RedisModule } from './redis/redis.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // ریشه monorepo اول — کلیدهای جدید فقط در .env ریشه هم خوانده می‌شوند
       envFilePath: [
+        resolve(__dirname, '../../.env'),
+        resolve(__dirname, '../../.env.local'),
         resolve(process.cwd(), '.env'),
         resolve(process.cwd(), '.env.local'),
-        resolve(process.cwd(), '../../.env'),
-        resolve(process.cwd(), '../../.env.local'),
       ],
     }),
     PrismaModule,

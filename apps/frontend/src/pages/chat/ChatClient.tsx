@@ -12,7 +12,6 @@ import {
   MessageRow,
   ModelRow,
   streamChat,
-  UserMe,
 } from "@/lib/api";
 import { useUserPrefs } from "@/hooks/use-user-prefs";
 import { loadUserPrefs } from "@/lib/user-prefs";
@@ -23,7 +22,6 @@ export function ChatClient() {
   const navigate = useNavigate();
   const { prefs } = useUserPrefs(true);
   const themeClass = prefs.chatTheme === "light" ? "chat-light" : "chat-dark";
-  const [user, setUser] = useState<UserMe | null>(null);
   const [models, setModels] = useState<ModelRow[]>([]);
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>();
@@ -47,9 +45,8 @@ export function ChatClient() {
     let cancelled = false;
     (async () => {
       try {
-        const me = await api<UserMe>("/auth/me");
+        await api("/auth/me");
         if (cancelled) return;
-        setUser(me);
         const [modelList, convList] = await Promise.all([
           api<ModelRow[]>("/models"),
           api<ConversationRow[]>("/conversations"),
@@ -63,6 +60,11 @@ export function ChatClient() {
             ? preferred
             : (modelList[0]?.id ?? "");
         setModelId(initial);
+        if (modelList.length === 0) {
+          setError(
+            "هیچ مدلی فعال نیست. در ترمینال پروژه npm run db:seed را اجرا کنید و صفحه را رفرش کنید.",
+          );
+        }
       } catch {
         navigate("/login", { replace: true });
       } finally {
@@ -73,6 +75,14 @@ export function ChatClient() {
       cancelled = true;
     };
   }, [navigate]);
+
+  useEffect(() => {
+    if (activeId || models.length === 0) return;
+    const preferred = prefs.defaultModelId;
+    if (preferred && models.some((m) => m.id === preferred)) {
+      setModelId(preferred);
+    }
+  }, [prefs.defaultModelId, models, activeId]);
 
   useEffect(() => {
     if (messages.length) scrollDown();
@@ -101,10 +111,17 @@ export function ChatClient() {
   }
 
   function newChat() {
+    abortRef.current?.abort();
     setActiveId(undefined);
     setMessages([]);
+    setInput("");
     setError(null);
-    if (models[0]) setModelId(models[0].id);
+    const preferred = loadUserPrefs().defaultModelId;
+    const nextModel =
+      preferred && models.some((m) => m.id === preferred)
+        ? preferred
+        : (models[0]?.id ?? "");
+    setModelId(nextModel);
   }
 
   async function removeChat(id: string, e: MouseEvent) {
@@ -163,6 +180,10 @@ export function ChatClient() {
           }
           if (ev.type === "error") {
             setError(ev.message ?? "خطا در چت");
+            if (ev.conversationId) {
+              setActiveId(ev.conversationId);
+              api<ConversationRow[]>("/conversations").then(setConversations);
+            }
           }
         },
         ac.signal,
@@ -208,7 +229,6 @@ export function ChatClient() {
         onToggle={() => setSidebarOpen((v) => !v)}
         conversations={conversations}
         activeId={activeId}
-        user={user}
         onNewChat={() => {
           newChat();
           setSidebarOpen(false);
@@ -219,7 +239,7 @@ export function ChatClient() {
       />
 
       <main className="flex-1 flex flex-col min-w-0 min-h-0 bg-[var(--chat-bg)]">
-        <header className="shrink-0 h-14 flex items-center justify-center px-14 md:px-4 border-b border-[var(--chat-border)]/80 bg-[var(--chat-bg)]/95 backdrop-blur-sm relative z-10">
+        <header className="shrink-0 h-14 box-border flex items-center justify-center px-14 md:px-4 border-b border-[var(--chat-border)]/80 bg-[var(--chat-bg)]/95 backdrop-blur-sm relative z-10">
           <div className="relative" ref={modelMenuRef}>
             <button
               type="button"
@@ -265,7 +285,7 @@ export function ChatClient() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="chat-scroll flex-1 min-h-0">
           <div className="max-w-3xl mx-auto px-4 min-h-full flex flex-col">
             {messages.length === 0 ? (
               <ChatEmptyState onPick={(t) => setInput(t)} />
@@ -291,6 +311,13 @@ export function ChatClient() {
           onSubmit={send}
           sending={sending}
           disabled={!modelId}
+          disabledHint={
+            !modelId && models.length === 0
+              ? "ابتدا مدل‌ها را با npm run db:seed بارگذاری کنید"
+              : !modelId
+                ? "یک مدل از منوی بالا انتخاب کنید"
+                : undefined
+          }
         />
       </main>
     </div>

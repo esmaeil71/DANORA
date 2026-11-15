@@ -8,6 +8,7 @@ import {
 } from '@google/generative-ai';
 import {
   CompletionResult,
+  ModelStreamConfig,
   ProviderAdapter,
   StreamChunk,
 } from '../model-router.types';
@@ -40,7 +41,7 @@ export class GoogleAdapter implements ProviderAdapter {
   }
 
   async *streamChat(
-    apiModelName: string,
+    { apiModelName }: ModelStreamConfig,
     messages: ChatMessage[],
   ): AsyncGenerator<StreamChunk, CompletionResult, undefined> {
     const client = this.getClient();

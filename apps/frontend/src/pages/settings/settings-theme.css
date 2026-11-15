@@ -11,3 +11,17 @@
   background: var(--st-bg);
   min-height: 100dvh;
 }
+
+.settings-light {
+  --st-bg: #f4f4f5;
+  --st-surface: #ffffff;
+  --st-surface-hover: #f4f4f5;
+  --st-border: #e4e4e7;
+  --st-text: #18181b;
+  --st-muted: #71717a;
+  --st-accent: #7c3aed;
+  --st-accent-soft: rgb(124 58 237 / 0.12);
+  color: var(--st-text);
+  background: var(--st-bg);
+  min-height: 100dvh;
+}

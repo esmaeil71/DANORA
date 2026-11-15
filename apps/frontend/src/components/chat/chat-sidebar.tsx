@@ -10,8 +10,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import type { ConversationRow, UserMe } from "@/lib/api";
-import { displayLabel } from "@/lib/user-prefs";
+import type { ConversationRow } from "@/lib/api";
 
 export function ChatSidebar({
   open,
@@ -19,7 +18,6 @@ export function ChatSidebar({
   onToggle,
   conversations,
   activeId,
-  user,
   onNewChat,
   onSelect,
   onRemove,
@@ -31,7 +29,6 @@ export function ChatSidebar({
   onToggle: () => void;
   conversations: ConversationRow[];
   activeId?: string;
-  user: UserMe | null;
   onNewChat: () => void;
   onSelect: (id: string) => void;
   onRemove: (id: string, e: MouseEvent) => void;
@@ -66,34 +63,36 @@ export function ChatSidebar({
           open ? "translate-x-0" : "translate-x-full md:translate-x-0"
         }`}
       >
-        <div className="p-3 border-b border-[var(--chat-border)] flex items-center gap-2">
+        <div className="shrink-0 h-14 px-3 border-b border-[var(--chat-border)]/80 flex items-center justify-between gap-2">
           <Link
             to="/"
-            className="flex items-center gap-2 font-semibold text-[var(--chat-text)] min-h-11 px-1 cursor-pointer"
+            className="flex items-center gap-2 font-semibold text-[var(--chat-text)] h-10 px-1 shrink-0 cursor-pointer"
           >
             <Sparkles className="size-5 text-[var(--chat-accent)]" aria-hidden />
             دانورا
           </Link>
-          <button
-            type="button"
-            onClick={onNewChat}
-            className="mr-auto min-h-10 px-3 rounded-lg text-sm bg-[var(--chat-accent)] text-white cursor-pointer hover:bg-[var(--chat-accent-hover)] transition-colors duration-200 inline-flex items-center gap-1.5"
-          >
-            <MessageSquarePlus className="size-4" aria-hidden />
-            گفتگوی جدید
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="md:hidden size-10 rounded-lg text-[var(--chat-muted)] cursor-pointer hover:bg-[var(--chat-surface-hover)] inline-flex items-center justify-center"
-            aria-label="بستن سایدبار"
-          >
-            <PanelRightClose className="size-5" />
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={onNewChat}
+              className="h-10 px-3 rounded-lg text-sm bg-[var(--chat-accent)] text-white cursor-pointer hover:bg-[var(--chat-accent-hover)] transition-colors duration-200 inline-flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <MessageSquarePlus className="size-4 shrink-0" aria-hidden />
+              گفتگوی جدید
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="md:hidden size-10 rounded-lg text-[var(--chat-muted)] cursor-pointer hover:bg-[var(--chat-surface-hover)] inline-flex items-center justify-center"
+              aria-label="بستن سایدبار"
+            >
+              <PanelRightClose className="size-5" />
+            </button>
+          </div>
         </div>
 
         <div
-          className="flex-1 overflow-y-auto p-2 space-y-0.5"
+          className="chat-scroll flex-1 min-h-0 p-2 space-y-0.5"
           aria-label="گفتگوها"
         >
           {conversations.length === 0 && (
@@ -129,12 +128,7 @@ export function ChatSidebar({
           ))}
         </div>
 
-        <div className="p-3 border-t border-[var(--chat-border)] text-xs text-[var(--chat-muted)] space-y-1">
-          {user && (
-            <p className="truncate px-1" title={user.email}>
-              {displayLabel(user.email)}
-            </p>
-          )}
+        <div className="p-3 border-t border-[var(--chat-border)] text-sm space-y-0.5">
           <Link
             to="/settings"
             className="flex items-center gap-2 min-h-10 px-2 rounded-lg hover:bg-[var(--chat-surface-hover)] text-[var(--chat-text)] cursor-pointer"

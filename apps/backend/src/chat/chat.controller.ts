@@ -36,6 +36,7 @@ export class ChatController {
       res.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
+    let conversationId: string | undefined;
     try {
       if (req.user.suspended) {
         throw new ForbiddenException('حساب کاربری مسدود شده است');
@@ -46,6 +47,7 @@ export class ChatController {
         dto.modelId,
         req.user.plan,
       );
+      conversationId = conversation.id;
 
       const history = await this.chat.loadHistory(conversation.id);
       await this.chat.saveUserMessage(conversation.id, dto.message);
@@ -91,7 +93,11 @@ export class ChatController {
     } catch (e) {
       const message =
         e instanceof Error ? e.message : 'خطای ناشناخته در پردازش چت';
-      send({ type: 'error', message });
+      send({
+        type: 'error',
+        message,
+        conversationId,
+      });
     }
 
     res.end();

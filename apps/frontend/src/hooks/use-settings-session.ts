@@ -9,7 +9,8 @@ export function useSettingsSession() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+
+    async function loadSession() {
       try {
         const [me, daily] = await Promise.all([
           api<UserMe>("/auth/me"),
@@ -23,9 +24,17 @@ export function useSettingsSession() {
       } finally {
         if (!cancelled) setLoading(false);
       }
-    })();
+    }
+
+    void loadSession();
+
+    const onFocus = () => {
+      void loadSession();
+    };
+    window.addEventListener("focus", onFocus);
     return () => {
       cancelled = true;
+      window.removeEventListener("focus", onFocus);
     };
   }, [navigate]);
 

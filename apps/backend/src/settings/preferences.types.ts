@@ -10,7 +10,12 @@ export type UserPreferences = {
 export const defaultPreferences: Required<
   Pick<
     UserPreferences,
-    'displayName' | 'density' | 'showSuggestionChips' | 'reduceMotionOverride' | 'chatTheme'
+    | 'displayName'
+    | 'density'
+    | 'showSuggestionChips'
+    | 'reduceMotionOverride'
+    | 'chatTheme'
+    | 'defaultModelId'
   >
 > = {
   displayName: '',
@@ -18,6 +23,7 @@ export const defaultPreferences: Required<
   showSuggestionChips: true,
   reduceMotionOverride: null,
   chatTheme: 'dark',
+  defaultModelId: '',
 };
 
 function normalizeChatTheme(value: unknown): 'dark' | 'light' {
@@ -31,5 +37,10 @@ export function mergePreferences(
   const patch = (raw ?? {}) as UserPreferences;
   const base = { ...defaultPreferences, ...patch };
   base.chatTheme = normalizeChatTheme(patch.chatTheme);
+  if (typeof patch.defaultModelId === 'string') {
+    base.defaultModelId = patch.defaultModelId;
+  } else if (base.defaultModelId === undefined) {
+    base.defaultModelId = '';
+  }
   return base;
 }

@@ -11,10 +11,16 @@ export interface CompletionResult {
   tokenOut: number;
 }
 
+export interface ModelStreamConfig {
+  apiModelName: string;
+  apiBaseUrl?: string | null;
+  apiKeyEnv?: string | null;
+}
+
 export interface ProviderAdapter {
   provider: ModelProvider;
   streamChat(
-    apiModelName: string,
+    config: ModelStreamConfig,
     messages: ChatMessage[],
   ): AsyncGenerator<StreamChunk, CompletionResult, undefined>;
 }

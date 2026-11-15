@@ -8,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import { copyToClipboard } from "@/lib/copy-to-clipboard";
 import {
   SettingsFieldRow,
   SettingsInput,
@@ -75,12 +76,12 @@ export function SettingsDeveloperPage() {
   );
 
   const copy = useCallback(async (text: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
+    const ok = await copyToClipboard(text);
+    if (ok) {
       setCopied(id);
       setTimeout(() => setCopied(null), 2000);
-    } catch {
-      /* ignore */
+    } else {
+      setErr("کپی در مرورگر ناموفق بود — متن را دستی انتخاب کنید");
     }
   }, []);
 

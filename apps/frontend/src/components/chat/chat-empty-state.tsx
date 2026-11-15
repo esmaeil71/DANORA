@@ -1,5 +1,5 @@
 import { Sparkles } from "lucide-react";
-import { loadUserPrefs } from "@/lib/user-prefs";
+import { useUserPrefs } from "@/hooks/use-user-prefs";
 
 const SUGGESTIONS = [
   "یک ایمیل رسمی برای درخواست جلسه بنویس",
@@ -13,7 +13,8 @@ export function ChatEmptyState({
 }: {
   onPick: (text: string) => void;
 }) {
-  const showChips = loadUserPrefs().showSuggestionChips;
+  const { prefs } = useUserPrefs(true);
+  const showChips = prefs.showSuggestionChips;
   return (
     <div className="flex flex-col items-center justify-center flex-1 px-4 py-12 text-center">
       <div className="size-14 rounded-2xl bg-[var(--chat-accent)]/15 flex items-center justify-center mb-6">

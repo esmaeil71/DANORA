@@ -35,6 +35,13 @@ export class ModelRouterService {
       throw new NotFoundException('ارائه‌دهنده مدل پشتیبانی نمی‌شود');
     }
 
-    return yield* adapter.streamChat(model.apiModelName, messages);
+    return yield* adapter.streamChat(
+      {
+        apiModelName: model.apiModelName,
+        apiBaseUrl: model.apiBaseUrl,
+        apiKeyEnv: model.apiKeyEnv,
+      },
+      messages,
+    );
   }
 }

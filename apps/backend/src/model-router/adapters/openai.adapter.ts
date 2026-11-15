@@ -5,6 +5,7 @@ import { ModelProvider } from '@prisma/client';
 import OpenAI from 'openai';
 import {
   CompletionResult,
+  ModelStreamConfig,
   ProviderAdapter,
   StreamChunk,
 } from '../model-router.types';
@@ -12,26 +13,33 @@ import {
 @Injectable()
 export class OpenAiAdapter implements ProviderAdapter {
   readonly provider = ModelProvider.openai;
-  private client: OpenAI | null = null;
+  private readonly clients = new Map<string, OpenAI>();
 
   constructor(private config: ConfigService) {}
 
-  private getClient(): OpenAI {
-    const key = this.config.get<string>('OPENAI_API_KEY');
+  private getClient(baseUrl?: string | null, apiKeyEnv?: string | null): OpenAI {
+    const envName = apiKeyEnv?.trim() || 'OPENAI_API_KEY';
+    const key = this.config.get<string>(envName);
     if (!key) {
-      throw new Error('OPENAI_API_KEY تنظیم نشده است');
+      throw new Error(`${envName} تنظیم نشده است`);
     }
-    if (!this.client) {
-      this.client = new OpenAI({ apiKey: key });
+    const cacheKey = `${baseUrl ?? 'default'}:${envName}`;
+    let client = this.clients.get(cacheKey);
+    if (!client) {
+      client = new OpenAI({
+        apiKey: key,
+        ...(baseUrl ? { baseURL: baseUrl.replace(/\/$/, '') } : {}),
+      });
+      this.clients.set(cacheKey, client);
     }
-    return this.client;
+    return client;
   }
 
   async *streamChat(
-    apiModelName: string,
+    { apiModelName, apiBaseUrl, apiKeyEnv }: ModelStreamConfig,
     messages: ChatMessage[],
   ): AsyncGenerator<StreamChunk, CompletionResult, undefined> {
-    const client = this.getClient();
+    const client = this.getClient(apiBaseUrl, apiKeyEnv);
     const stream = await client.chat.completions.create({
       model: apiModelName,
       messages: messages.map((m) => ({ role: m.role, content: m.content })),

@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useUserPrefs } from "@/hooks/use-user-prefs";
 import "../../pages/settings/settings-theme.css";
 
 const titles: Record<string, string> = {
@@ -18,6 +19,7 @@ const titles: Record<string, string> = {
 };
 
 export function SettingsShell() {
+  const { prefs } = useUserPrefs(true);
   const { pathname } = useLocation();
   const title =
     titles[pathname] ??
@@ -27,7 +29,9 @@ export function SettingsShell() {
   const backTo = pathname === "/settings" ? "/chat" : "/settings";
 
   return (
-    <div className="settings-dark min-h-[100dvh]">
+    <div
+      className={`${prefs.chatTheme === "light" ? "settings-light" : "settings-dark"} min-h-[100dvh]`}
+    >
       <header className="sticky top-0 z-10 border-b border-[var(--st-border)]/80 bg-[var(--st-bg)]/90 backdrop-blur-md">
         <div className="max-w-xl mx-auto h-14 px-4 flex items-center justify-between gap-3">
           <Link

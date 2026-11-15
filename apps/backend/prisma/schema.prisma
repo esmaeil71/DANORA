@@ -127,6 +127,8 @@ model ModelCatalog {
   provider          ModelProvider
   displayName       String        @map("display_name")
   apiModelName      String        @map("api_model_name")
+  apiBaseUrl        String?       @map("api_base_url")
+  apiKeyEnv         String?       @map("api_key_env")
   enabled           Boolean       @default(true)
   inputPricePer1k   Decimal       @default(0) @map("input_price_per_1k") @db.Decimal(10, 6)
   outputPricePer1k  Decimal       @default(0) @map("output_price_per_1k") @db.Decimal(10, 6)

@@ -1,6 +1,8 @@
 import { PrismaClient, ModelProvider } from '@prisma/client';
+import Redis from 'ioredis';
 
 const prisma = new PrismaClient();
+const MODEL_CACHE_KEY = 'model_catalog:enabled';
 
 const models = [
   {
@@ -27,7 +29,29 @@ const models = [
     inputPricePer1k: 0.0001,
     outputPricePer1k: 0.0004,
   },
+  {
+    id: 'deepseek-v4-pro',
+    provider: ModelProvider.openai,
+    displayName: 'DeepSeek V4 Pro (GapGPT)',
+    apiModelName: 'deepseek-v4-pro',
+    apiBaseUrl: 'https://api.gapgpt.app/v1',
+    apiKeyEnv: 'GAPGPT_API_KEY',
+    inputPricePer1k: 0.0001,
+    outputPricePer1k: 0.0004,
+  },
 ];
+
+async function invalidateModelCache() {
+  const url = process.env.REDIS_URL ?? 'redis://localhost:6380';
+  const redis = new Redis(url, { maxRetriesPerRequest: 1, lazyConnect: true });
+  try {
+    await redis.connect();
+    await redis.del(MODEL_CACHE_KEY);
+  } catch {
+  } finally {
+    redis.disconnect();
+  }
+}
 
 async function main() {
   for (const model of models) {
@@ -37,10 +61,13 @@ async function main() {
       update: {
         displayName: model.displayName,
         apiModelName: model.apiModelName,
+        apiBaseUrl: model.apiBaseUrl ?? null,
+        apiKeyEnv: model.apiKeyEnv ?? null,
         enabled: true,
       },
     });
   }
+  await invalidateModelCache();
 }
 
 main()

@@ -20,7 +20,8 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  private async bootstrapAdminRole(userId: string, email: string) {
+  /** ایمیل‌های ADMIN_EMAILS را به نقش admin ارتقا می‌دهد (روی login و /auth/me) */
+  async bootstrapAdminRole(userId: string, email: string) {
     if (!isConfiguredAdmin(this.config, email)) {
       return;
     }
@@ -86,5 +87,20 @@ export class AuthService {
 
   signToken(sub: string, email: string) {
     return this.jwt.sign({ sub, email });
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        plan: true,
+        role: true,
+        suspended: true,
+        createdAt: true,
+      },
+    });
+    return user;
   }
 }

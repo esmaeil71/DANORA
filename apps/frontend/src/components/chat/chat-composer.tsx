@@ -9,12 +9,14 @@ export function ChatComposer({
   onSubmit,
   sending,
   disabled,
+  disabledHint,
 }: {
   value: string;
   onChange: (v: string) => void;
   onSubmit: () => void;
   sending: boolean;
   disabled?: boolean;
+  disabledHint?: string;
 }) {
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -43,7 +45,11 @@ export function ChatComposer({
             onKeyDown={handleKeyDown}
             rows={1}
             disabled={disabled}
-            placeholder="پیام خود را بنویسید…"
+            placeholder={
+              disabled && disabledHint
+                ? disabledHint
+                : "پیام خود را بنویسید…"
+            }
             className="flex-1 max-h-40 min-h-[2.75rem] resize-none bg-transparent px-1 py-2 text-sm text-[var(--chat-text)] placeholder:text-[var(--chat-muted)] outline-none"
           />
           <button

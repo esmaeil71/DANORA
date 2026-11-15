@@ -17,11 +17,14 @@ export class ModelsService {
       await this.redis.client.connect();
       const cached = await this.redis.client.get(CACHE_KEY);
       if (cached) {
-        return JSON.parse(cached) as Array<{
+        const parsed = JSON.parse(cached) as Array<{
           id: string;
           provider: string;
           displayName: string;
         }>;
+        if (parsed.length > 0) {
+          return parsed;
+        }
       }
     } catch {
       /* Redis optional for local dev */
@@ -37,14 +40,22 @@ export class ModelsService {
       orderBy: { displayName: 'asc' },
     });
 
-    try {
-      await this.redis.client.setex(
-        CACHE_KEY,
-        CACHE_TTL_SEC,
-        JSON.stringify(models),
-      );
-    } catch {
-      /* ignore */
+    if (models.length > 0) {
+      try {
+        await this.redis.client.setex(
+          CACHE_KEY,
+          CACHE_TTL_SEC,
+          JSON.stringify(models),
+        );
+      } catch {
+        /* ignore */
+      }
+    } else {
+      try {
+        await this.redis.client.del(CACHE_KEY);
+      } catch {
+        /* ignore */
+      }
     }
 
     return models;

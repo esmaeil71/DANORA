@@ -62,7 +62,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  me(
+  async me(
     @Req()
     req: Request & {
       user: {
@@ -75,19 +75,15 @@ export class AuthController {
       };
     },
   ) {
-    const { id, email, plan, role, suspended, createdAt } = req.user;
+    await this.auth.bootstrapAdminRole(req.user.id, req.user.email);
+    const fresh = await this.auth.getProfile(req.user.id);
     return {
-      id,
-      email,
-      plan,
-      role,
-      suspended: suspended ?? false,
-      ...(createdAt && {
-        createdAt:
-          createdAt instanceof Date
-            ? createdAt.toISOString()
-            : new Date(createdAt).toISOString(),
-      }),
+      id: fresh.id,
+      email: fresh.email,
+      plan: fresh.plan,
+      role: fresh.role,
+      suspended: fresh.suspended,
+      createdAt: fresh.createdAt.toISOString(),
     };
   }
 

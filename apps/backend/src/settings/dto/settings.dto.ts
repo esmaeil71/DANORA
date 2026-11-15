@@ -5,6 +5,7 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import type { UserPreferences } from '../preferences.types';
 
@@ -23,6 +24,8 @@ export class PatchPreferencesDto implements UserPreferences {
   showSuggestionChips?: boolean;
 
   @IsOptional()
+  @ValidateIf((_o, v) => v !== null)
+  @IsBoolean()
   reduceMotionOverride?: boolean | null;
 
   @IsOptional()

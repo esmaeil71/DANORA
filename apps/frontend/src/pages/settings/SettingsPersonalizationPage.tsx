@@ -9,6 +9,7 @@ export function SettingsPersonalizationPage() {
   const { prefs, update } = useUserPrefs(true);
   const [models, setModels] = useState<ModelRow[]>([]);
   const [saving, setSaving] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     api<ModelRow[]>("/models")
@@ -18,8 +19,11 @@ export function SettingsPersonalizationPage() {
 
   async function save(patch: Parameters<typeof update>[0], key: string) {
     setSaving(key);
+    setErr(null);
     try {
       await update(patch);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "ذخیره نشد");
     } finally {
       setSaving(null);
     }
@@ -27,11 +31,17 @@ export function SettingsPersonalizationPage() {
 
   return (
     <main className="max-w-xl mx-auto px-4 py-6 pb-12 space-y-6">
+      {err && (
+        <p className="text-sm text-red-400 text-center px-2" role="alert">
+          {err}
+        </p>
+      )}
       <SettingsPanel title="چت">
         <SettingsToggle
           label="چیپ‌های پیشنهادی"
           description="نمایش پیشنهادها در شروع گفتگوی خالی"
           checked={prefs.showSuggestionChips}
+          busy={saving === "chips"}
           onChange={(v) => void save({ showSuggestionChips: v }, "chips")}
         />
         <div className="px-4 py-4 border-b border-[var(--st-border)] space-y-2">
@@ -109,8 +119,9 @@ export function SettingsPersonalizationPage() {
           label="کاهش حرکت"
           description="انیمیشن‌های کمتر (علاوه بر تنظیم سیستم‌عامل)"
           checked={prefs.reduceMotionOverride === true}
+          busy={saving === "motion"}
           onChange={(v) =>
-            void save({ reduceMotionOverride: v }, "motion")
+            void save({ reduceMotionOverride: v ? true : null }, "motion")
           }
         />
       </SettingsPanel>

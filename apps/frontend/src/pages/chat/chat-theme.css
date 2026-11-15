@@ -10,10 +10,76 @@
   --chat-user: #3f3f46;
   --chat-accent: #8b5cf6;
   --chat-accent-hover: #7c3aed;
+  --chat-scrollbar-size: 6px;
+  --chat-scrollbar-track: transparent;
+  --chat-scrollbar-thumb: rgb(161 161 170 / 0.22);
+  --chat-scrollbar-thumb-hover: rgb(139 92 246 / 0.65);
+  --chat-scrollbar-thumb-active: rgb(139 92 246 / 0.85);
   color: var(--chat-text);
   background: var(--chat-bg);
 }
 
 .chat-dark ::selection {
   background: rgb(139 92 246 / 0.35);
+}
+
+/* اسکرول‌بار نازک — مسیر شفاف، thumb با accent در hover (Firefox + WebKit) */
+.chat-dark .chat-scroll,
+.chat-light .chat-scroll {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--chat-scrollbar-thumb) var(--chat-scrollbar-track);
+}
+
+.chat-dark .chat-scroll::-webkit-scrollbar,
+.chat-light .chat-scroll::-webkit-scrollbar {
+  width: var(--chat-scrollbar-size);
+  height: var(--chat-scrollbar-size);
+}
+
+.chat-dark .chat-scroll::-webkit-scrollbar-track,
+.chat-light .chat-scroll::-webkit-scrollbar-track {
+  background: var(--chat-scrollbar-track);
+  margin-block: 4px;
+}
+
+.chat-dark .chat-scroll::-webkit-scrollbar-thumb,
+.chat-light .chat-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--chat-scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 200ms ease;
+}
+
+.chat-dark .chat-scroll::-webkit-scrollbar-thumb:hover,
+.chat-light .chat-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--chat-scrollbar-thumb-hover);
+}
+
+.chat-dark .chat-scroll::-webkit-scrollbar-thumb:active,
+.chat-light .chat-scroll::-webkit-scrollbar-thumb:active {
+  background-color: var(--chat-scrollbar-thumb-active);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chat-dark .chat-scroll:not(:hover):not(:focus-within)::-webkit-scrollbar-thumb {
+    background-color: rgb(161 161 170 / 0.12);
+  }
+
+  .chat-light .chat-scroll:not(:hover):not(:focus-within)::-webkit-scrollbar-thumb {
+    background-color: rgb(113 113 122 / 0.15);
+  }
+}
+
+.danora-reduce-motion .chat-scroll::-webkit-scrollbar-thumb {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-scroll::-webkit-scrollbar-thumb {
+    transition: none;
+  }
 }

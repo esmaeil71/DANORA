@@ -5,6 +5,7 @@ import { ModelProvider } from '@prisma/client';
 import Anthropic from '@anthropic-ai/sdk';
 import {
   CompletionResult,
+  ModelStreamConfig,
   ProviderAdapter,
   StreamChunk,
 } from '../model-router.types';
@@ -28,7 +29,7 @@ export class AnthropicAdapter implements ProviderAdapter {
   }
 
   async *streamChat(
-    apiModelName: string,
+    { apiModelName }: ModelStreamConfig,
     messages: ChatMessage[],
   ): AsyncGenerator<StreamChunk, CompletionResult, undefined> {
     const client = this.getClient();

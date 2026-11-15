@@ -58,6 +58,13 @@ export function saveUserPrefs(patch: Partial<UserPrefs>) {
   return next;
 }
 
+/** بازگردانی کامل ترجیحات (مثلاً بعد از خطای ذخیره روی سرور) */
+export function restoreUserPrefs(prefs: UserPrefs) {
+  const next = normalizePrefs(prefs);
+  cachePrefs(next);
+  return next;
+}
+
 export async function fetchAndCacheUserPrefs(): Promise<UserPrefs> {
   try {
     const remote = await api<Partial<UserPrefs>>("/auth/preferences");
