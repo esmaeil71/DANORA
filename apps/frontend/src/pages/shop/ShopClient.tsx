@@ -25,6 +25,7 @@ import { useUserPrefs } from "@/hooks/use-user-prefs";
 import { loadUserPrefs } from "@/lib/user-prefs";
 import { isPendingConversationId, titleFromUserMessage } from "@/lib/chat-title";
 import "./shop-theme.css";
+import "../chat/chat-theme.css";
 
 function mapMessages(rows: MessageRow[]): ShopMsg[] {
   return rows.map((m) => {

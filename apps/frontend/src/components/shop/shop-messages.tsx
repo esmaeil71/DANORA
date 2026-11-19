@@ -1,5 +1,6 @@
 import { Bot, ShoppingBag, User } from "lucide-react";
 import type { ProductOffer } from "@/lib/shop-types";
+import { ChatMessageBody } from "@/components/chat/chat-message-body";
 import { ShopProductGrid } from "./shop-product-grid";
 
 export type ShopMsg = {
@@ -13,46 +14,50 @@ export type ShopMsg = {
 
 export function ShopMessages({ messages }: { messages: ShopMsg[] }) {
   return (
-    <div className="flex flex-col gap-8 py-6">
+    <div className="chat-thread">
       {messages.map((m) =>
         m.role === "user" ? (
-          <div key={m.id} className="flex justify-start">
-            <div className="flex gap-3 max-w-[85%] flex-row-reverse items-start">
-              <div className="rounded-2xl rounded-tr-md bg-[var(--shop-user)] px-4 py-2.5 text-sm leading-7 whitespace-pre-wrap">
-                {m.content}
-              </div>
-              <span className="shrink-0 size-8 rounded-lg bg-[var(--shop-surface-hover)] flex items-center justify-center">
-                <User className="size-4 text-[var(--shop-muted)]" aria-hidden />
-              </span>
+          <article key={m.id} className="chat-row chat-row--user">
+            <span className="chat-avatar chat-avatar--user" aria-hidden>
+              <User className="size-4 text-[var(--shop-muted)]" />
+            </span>
+            <div className="chat-user-bubble bg-[var(--shop-user)] border-[var(--shop-border)]">
+              <ChatMessageBody content={m.content} variant="user" />
             </div>
-          </div>
+          </article>
         ) : (
-          <div key={m.id} className="space-y-4 max-w-3xl w-full">
-            <div className="flex gap-3">
-              <span className="shrink-0 size-8 rounded-lg bg-[var(--shop-accent-soft)] flex items-center justify-center">
-                <Bot className="size-4 text-[var(--shop-accent)]" aria-hidden />
-              </span>
-              <div className="flex-1 text-sm leading-7 whitespace-pre-wrap text-[var(--shop-text)]">
-                {m.content || (m.streaming ? (
-                  <span className="text-[var(--shop-muted)]">در حال آماده‌سازی…</span>
-                ) : (
-                  ""
-                ))}
+          <article key={m.id} className="chat-row chat-row--assistant">
+            <span
+              className="chat-avatar bg-[var(--shop-accent-soft)] text-[var(--shop-accent)]"
+              aria-hidden
+            >
+              <Bot className="size-4" />
+            </span>
+            <div className="chat-assistant-block flex-1 min-w-0">
+              <div className="chat-assistant-surface">
+                {m.content.trim() ? (
+                  <ChatMessageBody content={m.content} variant="assistant" />
+                ) : m.streaming ? (
+                  <p className="chat-msg-streaming text-[var(--shop-muted)]">
+                    <span className="chat-msg-streaming-dot bg-[var(--shop-accent)]" />
+                    در حال آماده‌سازی…
+                  </p>
+                ) : null}
               </div>
-            </div>
-            {m.products && m.products.length > 0 && (
-              <div className="pr-11">
-                <div className="flex items-center gap-2 text-xs text-[var(--shop-muted)] mb-2">
-                  <ShoppingBag className="size-4" aria-hidden />
-                  نتایج از فروشگاه‌های متصل
+              {m.products && m.products.length > 0 && (
+                <div className="chat-shop-embed border-[var(--shop-border)] bg-[var(--shop-surface)]">
+                  <div className="flex items-center gap-2 text-xs text-[var(--shop-muted)] mb-2">
+                    <ShoppingBag className="size-4" aria-hidden />
+                    نتایج از فروشگاه‌های متصل
+                  </div>
+                  <ShopProductGrid
+                    products={m.products}
+                    fetchedAt={m.fetchedAt}
+                  />
                 </div>
-                <ShopProductGrid
-                  products={m.products}
-                  fetchedAt={m.fetchedAt}
-                />
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </article>
         ),
       )}
     </div>

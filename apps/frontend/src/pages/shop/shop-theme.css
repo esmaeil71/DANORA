@@ -74,3 +74,19 @@
   background: var(--shop-surface);
   color: var(--shop-text);
 }
+
+.shop-dark .chat-msg-body,
+.shop-light .chat-msg-body {
+  color: var(--shop-text);
+}
+
+.shop-dark .chat-msg-streaming,
+.shop-light .chat-msg-streaming {
+  color: var(--shop-muted);
+}
+
+.shop-dark .chat-avatar--user,
+.shop-light .chat-avatar--user {
+  background: var(--shop-surface-hover);
+  color: var(--shop-muted);
+}
