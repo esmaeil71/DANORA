@@ -5,6 +5,7 @@ import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ChatPage } from "./pages/ChatPage";
+import { ChatModelsPage } from "./pages/chat/ChatModelsPage";
 import { SettingsShell } from "./components/settings/settings-shell";
 import { SettingsHub } from "./pages/settings/SettingsHub";
 import { SettingsAccountPage } from "./pages/settings/SettingsAccountPage";
@@ -30,6 +31,7 @@ export function App() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/chat" element={<ChatPage />} />
+      <Route path="/chat/models" element={<ChatModelsPage />} />
       <Route path="/settings" element={<SettingsShell />}>
         <Route index element={<SettingsHub />} />
         <Route path="account" element={<SettingsAccountPage />} />

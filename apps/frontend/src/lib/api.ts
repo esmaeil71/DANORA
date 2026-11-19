@@ -95,6 +95,9 @@ export type SseHandler = (event: {
   type: string;
   delta?: string;
   conversationId?: string;
+  title?: string;
+  modelId?: string;
+  updatedAt?: string;
   messageId?: string;
   message?: string;
 }) => void;

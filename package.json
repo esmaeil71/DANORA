@@ -15,6 +15,7 @@
     "dev:clean": "npm run dev:clean -w @danora/frontend",
     "build": "npm run build -w @danora/shared && npm run build -w @danora/backend && npm run build -w @danora/frontend",
     "db:setup": "node scripts/sync-dev-env.mjs && npm exec -w @danora/backend prisma migrate deploy && npm exec -w @danora/backend prisma db seed",
+    "db:up": "docker compose up -d postgres redis",
     "db:migrate": "npm exec -w @danora/backend prisma migrate deploy",
     "db:seed": "npm exec -w @danora/backend prisma db seed"
   }

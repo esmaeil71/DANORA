@@ -2,20 +2,16 @@ import type { MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   LogOut,
-  Menu,
   MessageSquarePlus,
-  PanelRightClose,
   Settings,
   Sparkles,
   Trash2,
-  X,
 } from "lucide-react";
 import type { ConversationRow } from "@/lib/api";
 
 export function ChatSidebar({
   open,
   onClose,
-  onToggle,
   conversations,
   activeId,
   onNewChat,
@@ -26,7 +22,6 @@ export function ChatSidebar({
 }: {
   open: boolean;
   onClose: () => void;
-  onToggle: () => void;
   conversations: ConversationRow[];
   activeId?: string;
   onNewChat: () => void;
@@ -38,30 +33,28 @@ export function ChatSidebar({
   const rowClass = compact
     ? "min-h-8 py-1.5 text-xs"
   : "min-h-10 py-2 text-sm";
+  function closeOnMobileAfterSelect() {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      onClose();
+    }
+  }
+
+  if (!open) {
+    return null;
+  }
+
   return (
     <>
       <button
         type="button"
-        onClick={onToggle}
-        aria-label="منوی گفتگوها"
-        className="md:hidden fixed top-3 right-3 z-30 size-11 rounded-lg border border-[var(--chat-border)] bg-[var(--chat-surface)] text-[var(--chat-text)] cursor-pointer inline-flex items-center justify-center"
-      >
-        {open ? <X className="size-5" /> : <Menu className="size-5" />}
-      </button>
-
-      {open && (
-        <button
-          type="button"
-          aria-label="بستن منو"
-          className="md:hidden fixed inset-0 z-20 bg-black/60"
-          onClick={onClose}
-        />
-      )}
+        aria-label="بستن منو"
+        className="md:hidden fixed inset-0 z-20 bg-black/60"
+        onClick={onClose}
+      />
 
       <aside
-        className={`chat-sidebar-panel fixed md:relative z-30 md:z-auto inset-y-0 right-0 w-[min(100%,280px)] flex flex-col border-l border-[var(--chat-border)] bg-[var(--chat-surface)] transition-transform duration-200 md:translate-x-0 ${
-          open ? "translate-x-0" : "translate-x-full md:translate-x-0"
-        }`}
+        id="chat-conversations-sidebar"
+        className="chat-sidebar-panel fixed md:relative z-30 md:z-auto inset-y-0 right-0 w-[min(100%,280px)] shrink-0 flex flex-col border-l border-[var(--chat-border)] bg-[var(--chat-surface)] transition-transform duration-200 translate-x-0"
       >
         <div className="shrink-0 h-14 px-3 border-b border-[var(--chat-border)]/80 flex items-center justify-between gap-2">
           <Link
@@ -79,14 +72,6 @@ export function ChatSidebar({
             >
               <MessageSquarePlus className="size-4 shrink-0" aria-hidden />
               گفتگوی جدید
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="md:hidden size-10 rounded-lg text-[var(--chat-muted)] cursor-pointer hover:bg-[var(--chat-surface-hover)] inline-flex items-center justify-center"
-              aria-label="بستن سایدبار"
-            >
-              <PanelRightClose className="size-5" />
             </button>
           </div>
         </div>
@@ -106,7 +91,7 @@ export function ChatSidebar({
                 type="button"
                 onClick={() => {
                   onSelect(c.id);
-                  onClose();
+                  closeOnMobileAfterSelect();
                 }}
                 className={`w-full text-right px-3 rounded-lg truncate cursor-pointer transition-colors duration-200 ${rowClass} ${
                   activeId === c.id

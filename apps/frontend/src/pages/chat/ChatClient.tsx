@@ -1,11 +1,12 @@
 import type { MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2, PanelRight, PanelRightClose } from "lucide-react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatEmptyState } from "@/components/chat/chat-empty-state";
 import { ChatMessages } from "@/components/chat/chat-messages";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
+import { ChatModelMenu } from "@/components/chat/chat-model-menu";
 import {
   api,
   ConversationRow,
@@ -15,11 +16,16 @@ import {
 } from "@/lib/api";
 import { useUserPrefs } from "@/hooks/use-user-prefs";
 import { loadUserPrefs } from "@/lib/user-prefs";
+import {
+  isPendingConversationId,
+  titleFromUserMessage,
+} from "@/lib/chat-title";
 
 type LocalMessage = MessageRow & { streaming?: boolean };
 
 export function ChatClient() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { prefs } = useUserPrefs(true);
   const themeClass = prefs.chatTheme === "light" ? "chat-light" : "chat-dark";
   const [models, setModels] = useState<ModelRow[]>([]);
@@ -31,7 +37,7 @@ export function ChatClient() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [modelOpen, setModelOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -101,7 +107,38 @@ export function ChatClient() {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
+  useEffect(() => {
+    const picked = (location.state as { modelId?: string } | null)?.modelId;
+    if (!picked || models.length === 0) return;
+    if (models.some((m) => m.id === picked)) {
+      setModelId(picked);
+      navigate("/chat", { replace: true, state: {} });
+    }
+  }, [location.state, models, navigate]);
+
+  function upsertSidebarConversation(row: ConversationRow, replacePending?: boolean) {
+    setConversations((list) => {
+      const withoutPending = replacePending
+        ? list.filter((c) => !isPendingConversationId(c.id))
+        : list;
+      const idx = withoutPending.findIndex((c) => c.id === row.id);
+      if (idx >= 0) {
+        const next = [...withoutPending];
+        next[idx] = { ...next[idx], ...row };
+        return next.sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+      }
+      return [row, ...withoutPending].sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      );
+    });
+  }
+
   async function loadConversation(id: string) {
+    if (isPendingConversationId(id)) return;
     setActiveId(id);
     setError(null);
     const conv = conversations.find((c) => c.id === id);
@@ -126,13 +163,18 @@ export function ChatClient() {
 
   async function removeChat(id: string, e: MouseEvent) {
     e.stopPropagation();
+    if (isPendingConversationId(id)) {
+      setConversations((list) => list.filter((c) => c.id !== id));
+      if (activeId === id) newChat();
+      return;
+    }
     await api(`/conversations/${id}`, { method: "DELETE" });
     setConversations((list) => list.filter((c) => c.id !== id));
     if (activeId === id) newChat();
   }
 
-  async function send() {
-    const text = input.trim();
+  async function send(messageOverride?: string) {
+    const text = (messageOverride ?? input).trim();
     if (!text || !modelId || sending) return;
 
     setInput("");
@@ -157,14 +199,55 @@ export function ChatClient() {
     setMessages((m) => [...m, userMsg, assistantMsg]);
     scrollDown();
 
+    const sidebarTitle = titleFromUserMessage(text);
+    const now = new Date().toISOString();
+    const requestConvId = isPendingConversationId(activeId)
+      ? undefined
+      : activeId;
+
+    if (!requestConvId) {
+      const pendingId = `pending-${Date.now()}`;
+      setActiveId(pendingId);
+      upsertSidebarConversation({
+        id: pendingId,
+        title: sidebarTitle,
+        modelId,
+        updatedAt: now,
+      });
+    } else {
+      upsertSidebarConversation({
+        id: requestConvId,
+        title:
+          conversations.find((c) => c.id === requestConvId)?.title ===
+          "گفتگوی جدید"
+            ? sidebarTitle
+            : (conversations.find((c) => c.id === requestConvId)?.title ??
+              sidebarTitle),
+        modelId,
+        updatedAt: now,
+      });
+    }
+
     abortRef.current?.abort();
     const ac = new AbortController();
     abortRef.current = ac;
 
     try {
       await streamChat(
-        { conversationId: activeId, modelId, message: text },
+        { conversationId: requestConvId, modelId, message: text },
         (ev) => {
+          if (ev.type === "conversation" && ev.conversationId) {
+            setActiveId(ev.conversationId);
+            upsertSidebarConversation(
+              {
+                id: ev.conversationId,
+                title: ev.title ?? sidebarTitle,
+                modelId: ev.modelId ?? modelId,
+                updatedAt: ev.updatedAt ?? now,
+              },
+              true,
+            );
+          }
           if (ev.type === "delta" && ev.delta) {
             setMessages((prev) =>
               prev.map((m) =>
@@ -182,7 +265,20 @@ export function ChatClient() {
             setError(ev.message ?? "خطا در چت");
             if (ev.conversationId) {
               setActiveId(ev.conversationId);
-              api<ConversationRow[]>("/conversations").then(setConversations);
+              upsertSidebarConversation(
+                {
+                  id: ev.conversationId,
+                  title: sidebarTitle,
+                  modelId,
+                  updatedAt: now,
+                },
+                true,
+              );
+            } else if (!requestConvId) {
+              setConversations((list) =>
+                list.filter((c) => !isPendingConversationId(c.id)),
+              );
+              setActiveId(undefined);
             }
           }
         },
@@ -197,6 +293,12 @@ export function ChatClient() {
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
         setError(err instanceof Error ? err.message : "خطا");
+      }
+      if (!requestConvId) {
+        setConversations((list) =>
+          list.filter((c) => !isPendingConversationId(c.id)),
+        );
+        setActiveId(undefined);
       }
       setMessages((prev) => prev.filter((m) => m.id !== assistantId));
     } finally {
@@ -226,12 +328,13 @@ export function ChatClient() {
         compact={prefs.density === "compact"}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        onToggle={() => setSidebarOpen((v) => !v)}
         conversations={conversations}
         activeId={activeId}
         onNewChat={() => {
           newChat();
-          setSidebarOpen(false);
+          if (window.matchMedia("(max-width: 767px)").matches) {
+            setSidebarOpen(false);
+          }
         }}
         onSelect={loadConversation}
         onRemove={removeChat}
@@ -239,8 +342,29 @@ export function ChatClient() {
       />
 
       <main className="flex-1 flex flex-col min-w-0 min-h-0 bg-[var(--chat-bg)]">
-        <header className="shrink-0 h-14 box-border flex items-center justify-center px-14 md:px-4 border-b border-[var(--chat-border)]/80 bg-[var(--chat-bg)]/95 backdrop-blur-sm relative z-10">
-          <div className="relative" ref={modelMenuRef}>
+        <header className="shrink-0 h-14 box-border grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 sm:px-4 border-b border-[var(--chat-border)]/80 bg-[var(--chat-bg)]/95 backdrop-blur-sm relative z-20 overflow-visible">
+          <div className="flex justify-start min-w-0">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label={
+                sidebarOpen ? "بستن فهرست گفتگوها" : "نمایش فهرست گفتگوها"
+              }
+              aria-expanded={sidebarOpen}
+              aria-controls="chat-conversations-sidebar"
+              className="inline-flex items-center gap-2 min-h-11 min-w-11 px-2.5 sm:px-3 rounded-xl text-sm text-[var(--chat-muted)] hover:text-[var(--chat-text)] hover:bg-[var(--chat-surface-hover)] cursor-pointer transition-colors duration-200"
+            >
+              {sidebarOpen ? (
+                <PanelRightClose className="size-5 shrink-0" aria-hidden />
+              ) : (
+                <PanelRight className="size-5 shrink-0" aria-hidden />
+              )}
+              <span className="hidden sm:inline font-medium text-[var(--chat-text)]">
+                گفتگوها
+              </span>
+            </button>
+          </div>
+          <div className="relative justify-self-center" ref={modelMenuRef}>
             <button
               type="button"
               onClick={(e) => {
@@ -252,37 +376,32 @@ export function ChatClient() {
               aria-haspopup="listbox"
             >
               <span className="text-[var(--chat-muted)]">مدل:</span>
-              <span className="font-medium">
+              <span className="font-medium max-w-[40vw] sm:max-w-none truncate">
                 {currentModel?.displayName ?? "انتخاب مدل"}
               </span>
-              <ChevronDown className="size-4 text-[var(--chat-muted)]" />
+              <ChevronDown
+                className={`size-4 text-[var(--chat-muted)] shrink-0 transition-transform duration-200 ${
+                  modelOpen ? "rotate-180" : ""
+                }`}
+                aria-hidden
+              />
             </button>
             {modelOpen && (
-              <ul
-                role="listbox"
-                className="absolute top-full mt-1 right-0 min-w-[220px] py-1 rounded-xl border border-[var(--chat-border)] bg-[var(--chat-surface)] shadow-xl z-50"
-              >
-                {models.map((m) => (
-                  <li key={m.id} role="option" aria-selected={m.id === modelId}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setModelId(m.id);
-                        setModelOpen(false);
-                      }}
-                      className={`w-full text-right px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                        m.id === modelId
-                          ? "bg-[var(--chat-accent)]/20 text-[var(--chat-text)]"
-                          : "text-[var(--chat-muted)] hover:bg-[var(--chat-surface-hover)] hover:text-[var(--chat-text)]"
-                      }`}
-                    >
-                      {m.displayName}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <ChatModelMenu
+                models={models}
+                modelId={modelId}
+                onSelect={(id) => {
+                  setModelId(id);
+                  setModelOpen(false);
+                }}
+                onOpenAllModels={() => {
+                  setModelOpen(false);
+                  navigate("/chat/models");
+                }}
+              />
             )}
           </div>
+          <div className="min-w-0" aria-hidden />
         </header>
 
         <div className="chat-scroll flex-1 min-h-0">

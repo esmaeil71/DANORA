@@ -88,6 +88,28 @@ export class ChatService {
     });
   }
 
+  titleFromFirstMessage(firstMessage: string) {
+    return firstMessage.length > 48
+      ? firstMessage.slice(0, 48) + '…'
+      : firstMessage;
+  }
+
+  async getConversationSidebarMeta(conversationId: string) {
+    const row = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { id: true, title: true, modelId: true, updatedAt: true },
+    });
+    if (!row) {
+      throw new NotFoundException('گفتگو یافت نشد');
+    }
+    return {
+      id: row.id,
+      title: row.title,
+      modelId: row.modelId,
+      updatedAt: row.updatedAt.toISOString(),
+    };
+  }
+
   async maybeSetTitle(conversationId: string, firstMessage: string) {
     const conv = await this.prisma.conversation.findUnique({
       where: { id: conversationId },
@@ -95,10 +117,7 @@ export class ChatService {
     if (!conv || conv.title !== 'گفتگوی جدید') {
       return;
     }
-    const title =
-      firstMessage.length > 48
-        ? firstMessage.slice(0, 48) + '…'
-        : firstMessage;
+    const title = this.titleFromFirstMessage(firstMessage);
     await this.prisma.conversation.update({
       where: { id: conversationId },
       data: { title },

@@ -61,6 +61,15 @@ export class ChatController {
         await this.chat.maybeSetTitle(conversation.id, dto.message);
       }
 
+      const meta = await this.chat.getConversationSidebarMeta(conversation.id);
+      send({
+        type: 'conversation',
+        conversationId: meta.id,
+        title: meta.title,
+        modelId: meta.modelId,
+        updatedAt: meta.updatedAt,
+      });
+
       const gen = this.chat.stream(conversation.modelId, messages);
       let result = await gen.next();
 

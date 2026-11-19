@@ -7,6 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sharedDir = join(root, "packages/shared");
 
 execSync("node scripts/sync-dev-env.mjs", { cwd: root, stdio: "inherit" });
+execSync("node scripts/check-dev-deps.mjs", { cwd: root, stdio: "inherit" });
 
 const sharedDist = join(sharedDir, "dist/index.js");
 if (!existsSync(sharedDist)) {

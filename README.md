@@ -16,6 +16,14 @@ npm run db:setup
 npm run dev
 ```
 
+اگر **اتصال به API** یا خطای `Can't reach database server at localhost:5432` دیدید:
+
+```bash
+npm run db:up
+npm run db:migrate
+npm run dev
+```
+
 - `docker compose up -d` — PostgreSQL و Redis
 - `npm run dev` — backend و frontend با هم (پورت‌های ۴۰۰۰ و ۳۰۰۰)
 

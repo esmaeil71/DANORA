@@ -1,0 +1,65 @@
+.landing-page {
+  --landing-max: 72rem;
+  --landing-section-y: clamp(3.5rem, 8vw, 5.5rem);
+}
+
+.landing-dot-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in srgb, var(--color-border) 55%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 28px 28px;
+}
+
+.landing-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.landing-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    transform 200ms ease;
+}
+
+.landing-card:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+}
+
+.landing-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ring) 35%, transparent);
+}
+
+.landing-mockup-pulse {
+  animation: landing-caret 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-mockup-pulse {
+    animation: none;
+    opacity: 0.7;
+  }
+
+  .landing-card:hover {
+    transform: none;
+  }
+}
+
+@keyframes landing-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
