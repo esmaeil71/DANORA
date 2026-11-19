@@ -4,7 +4,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AnthropicAdapter } from './adapters/anthropic.adapter';
 import { GoogleAdapter } from './adapters/google.adapter';
 import { OpenAiAdapter } from './adapters/openai.adapter';
-import { CompletionResult, StreamChunk, ProviderAdapter } from './model-router.types';
+import {
+  CompleteOptions,
+  CompletionResult,
+  StreamChunk,
+  ProviderAdapter,
+} from './model-router.types';
 
 @Injectable()
 export class ModelRouterService {
@@ -42,6 +47,32 @@ export class ModelRouterService {
         apiKeyEnv: model.apiKeyEnv,
       },
       messages,
+    );
+  }
+
+  async completeChat(
+    modelId: string,
+    messages: ChatMessage[],
+    options?: CompleteOptions,
+  ): Promise<CompletionResult> {
+    const model = await this.prisma.modelCatalog.findFirst({
+      where: { id: modelId, enabled: true },
+    });
+    if (!model) {
+      throw new NotFoundException('مدل یافت نشد یا غیرفعال است');
+    }
+    const adapter = this.adapters.find((a) => a.provider === model.provider);
+    if (!adapter) {
+      throw new NotFoundException('ارائه‌دهنده مدل پشتیبانی نمی‌شود');
+    }
+    return adapter.completeChat(
+      {
+        apiModelName: model.apiModelName,
+        apiBaseUrl: model.apiBaseUrl,
+        apiKeyEnv: model.apiKeyEnv,
+      },
+      messages,
+      options,
     );
   }
 }

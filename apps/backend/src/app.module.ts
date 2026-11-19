@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { SettingsModule } from './settings/settings.module';
 import { AdminModule } from './admin/admin.module';
+import { ShopModule } from './shop/shop.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { ModelsModule } from './models/models.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -30,6 +31,7 @@ import { RedisModule } from './redis/redis.module';
     ChatModule,
     SettingsModule,
     AdminModule,
+    ShopModule,
   ],
 })
 export class AppModule {}

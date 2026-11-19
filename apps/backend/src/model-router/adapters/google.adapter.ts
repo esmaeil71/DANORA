@@ -7,6 +7,7 @@ import {
   Content,
 } from '@google/generative-ai';
 import {
+  CompleteOptions,
   CompletionResult,
   ModelStreamConfig,
   ProviderAdapter,
@@ -74,6 +75,34 @@ export class GoogleAdapter implements ProviderAdapter {
     );
     const tokenOut = Math.ceil(content.length / 4);
 
+    return { content, tokenIn, tokenOut };
+  }
+
+  async completeChat(
+    { apiModelName }: ModelStreamConfig,
+    messages: ChatMessage[],
+    options?: CompleteOptions,
+  ): Promise<CompletionResult> {
+    const client = this.getClient();
+    const system = messages.find((m) => m.role === 'system')?.content;
+    const model = client.getGenerativeModel({
+      model: apiModelName,
+      systemInstruction: system,
+      generationConfig: {
+        maxOutputTokens: options?.maxTokens ?? 512,
+        temperature: options?.temperature ?? 0.2,
+      },
+    });
+    const parts = messages
+      .filter((m) => m.role !== 'system')
+      .map((m) => `${m.role}: ${m.content}`)
+      .join('\n\n');
+    const res = await model.generateContent(parts);
+    const content = res.response.text();
+    const tokenIn = Math.ceil(
+      messages.reduce((s, m) => s + m.content.length, 0) / 4,
+    );
+    const tokenOut = Math.ceil(content.length / 4);
     return { content, tokenIn, tokenOut };
   }
 }

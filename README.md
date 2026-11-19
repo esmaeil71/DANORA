@@ -29,6 +29,8 @@ npm run dev
 
 **پنل ادمین:** در `.env` مقدار `ADMIN_EMAILS` را با ایمیل خود تنظیم کنید، یک‌بار دوباره وارد شوید، سپس از تنظیمات → **پنل ادمین** یا مسیر `/settings/admin`.
 
+**خرید هوشمند:** مسیر `/shop` — جستجو از دیجی‌کالا (کلید [Open Platform](https://www.digikala.com/landing/open-platform/) در `DIGIKALA_OPEN_API_KEY`) و ترب. بدون کلید دیجی‌کالا در dev نتایج نمونه نمایش داده می‌شود.
+
 | دستور | توضیح |
 |--------|--------|
 | `npm install` | وابستگی‌های همه workspaceها |

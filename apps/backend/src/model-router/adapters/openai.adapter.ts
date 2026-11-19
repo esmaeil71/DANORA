@@ -4,6 +4,7 @@ import { ChatMessage } from '@danora/shared';
 import { ModelProvider } from '@prisma/client';
 import OpenAI from 'openai';
 import {
+  CompleteOptions,
   CompletionResult,
   ModelStreamConfig,
   ProviderAdapter,
@@ -70,6 +71,24 @@ export class OpenAiAdapter implements ProviderAdapter {
       );
     }
 
+    return { content, tokenIn, tokenOut };
+  }
+
+  async completeChat(
+    { apiModelName, apiBaseUrl, apiKeyEnv }: ModelStreamConfig,
+    messages: ChatMessage[],
+    options?: CompleteOptions,
+  ): Promise<CompletionResult> {
+    const client = this.getClient(apiBaseUrl, apiKeyEnv);
+    const res = await client.chat.completions.create({
+      model: apiModelName,
+      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+      max_tokens: options?.maxTokens ?? 512,
+      temperature: options?.temperature ?? 0.2,
+    });
+    const content = res.choices[0]?.message?.content ?? '';
+    const tokenIn = res.usage?.prompt_tokens ?? 0;
+    const tokenOut = res.usage?.completion_tokens ?? 0;
     return { content, tokenIn, tokenOut };
   }
 }

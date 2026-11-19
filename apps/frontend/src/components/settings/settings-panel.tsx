@@ -12,11 +12,9 @@ export function SettingsPanel({
   return (
     <section className={className}>
       {title && (
-        <h2 className="text-xs font-medium text-[var(--st-muted)] mb-2 px-1">
-          {title}
-        </h2>
+        <h2 className="settings-section-label">{title}</h2>
       )}
-      <div className="rounded-2xl border border-[var(--st-border)] bg-[var(--st-surface)] overflow-hidden">
+      <div className="settings-card overflow-hidden">
         {children}
       </div>
     </section>
@@ -52,7 +50,7 @@ export function SettingsInput({
   return (
     <input
       {...props}
-      className={`w-full min-h-11 rounded-xl border border-[var(--st-border)] bg-[var(--st-surface-hover)] px-3 text-sm text-[var(--st-text)] placeholder:text-[var(--st-muted)] focus:border-violet-500 focus:outline-none transition-colors ${className}`}
+      className={`w-full min-h-11 rounded-xl border border-[var(--st-border)] bg-[var(--st-surface-hover)] px-3 text-sm text-[var(--st-text)] placeholder:text-[var(--st-muted)] focus:border-[var(--st-accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--st-accent-soft)] transition-colors ${className}`}
     />
   );
 }

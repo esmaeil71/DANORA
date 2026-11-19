@@ -16,6 +16,7 @@ const titles: Record<string, string> = {
   "/settings/admin/users": "کاربران",
   "/settings/admin/requests": "درخواست‌ها",
   "/settings/admin/models": "مدل‌ها",
+  "/settings/admin/shop": "مارکت‌پلیس",
 };
 
 export function SettingsShell() {
@@ -30,19 +31,30 @@ export function SettingsShell() {
 
   return (
     <div
-      className={`${prefs.chatTheme === "light" ? "settings-light" : "settings-dark"} min-h-[100dvh]`}
+      className={`settings-root ${prefs.chatTheme === "light" ? "settings-light" : "settings-dark"} min-h-[100dvh]`}
     >
-      <header className="sticky top-0 z-10 border-b border-[var(--st-border)]/80 bg-[var(--st-bg)]/90 backdrop-blur-md">
-        <div className="max-w-xl mx-auto h-14 px-4 flex items-center justify-between gap-3">
-          <Link
-            to={backTo}
-            className="min-h-10 inline-flex items-center gap-2 text-sm text-[var(--st-muted)] hover:text-[var(--st-text)] transition-colors"
-          >
-            <ArrowRight className="size-4" aria-hidden />
-            {pathname === "/settings" ? "بازگشت به چت" : "تنظیمات"}
-          </Link>
-          <span className="text-sm font-semibold text-[var(--st-text)]">{title}</span>
-          <span className="w-[88px]" aria-hidden />
+      <header className="sticky top-0 z-10 border-b border-[var(--st-border)]/70 bg-[color-mix(in_srgb,var(--st-bg)_88%,transparent)] backdrop-blur-md">
+        <div className="max-w-lg mx-auto px-4 py-3">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 min-h-11">
+            <Link
+              to={backTo}
+              className="settings-header-link inline-flex items-center gap-1.5 text-sm text-[var(--st-muted)] justify-self-start"
+            >
+              <ArrowRight className="size-4 shrink-0" aria-hidden />
+              <span className="truncate max-w-[9rem] sm:max-w-none">
+                {pathname === "/settings" ? "بازگشت به چت" : "تنظیمات"}
+              </span>
+            </Link>
+            <h1 className="text-sm font-semibold text-[var(--st-text)] text-center px-1">
+              {title}
+            </h1>
+            <span className="justify-self-end w-11" aria-hidden />
+          </div>
+          {pathname === "/settings" && (
+            <p className="mt-1 text-center text-xs text-[var(--st-muted)] leading-relaxed">
+              حساب، سهمیه، ترجیحات و ابزارهای شما
+            </p>
+          )}
         </div>
       </header>
       <Outlet />

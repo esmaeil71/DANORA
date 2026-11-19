@@ -1,4 +1,4 @@
-import { FileText, Loader2, Mic, MicOff, Plus, Send, X } from "lucide-react";
+import { FileText, Loader2, Mic, MicOff, Plus, Send, ShoppingBag, X } from "lucide-react";
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import {
   type ChatAttachment,
@@ -21,6 +21,10 @@ export function ChatComposer({
   sending,
   disabled,
   disabledHint,
+  placeholder,
+  shopMode,
+  onShopModeChange,
+  footerHint,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -28,6 +32,10 @@ export function ChatComposer({
   sending: boolean;
   disabled?: boolean;
   disabledHint?: string;
+  placeholder?: string;
+  shopMode?: boolean;
+  onShopModeChange?: (v: boolean) => void;
+  footerHint?: string;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -216,9 +224,26 @@ export function ChatComposer({
             onChange={(e) => void onFilesPicked(e.target.files)}
           />
 
+          {onShopModeChange && (
+            <button
+              type="button"
+              onClick={() => onShopModeChange(!shopMode)}
+              aria-pressed={shopMode}
+              aria-label={shopMode ? "حالت خرید فعال" : "فعال‌سازی حالت خرید"}
+              title={shopMode ? "جستجوی محصول" : "حالت چت عادی"}
+              className={`shrink-0 size-11 rounded-xl border cursor-pointer inline-flex items-center justify-center transition-colors ${
+                shopMode
+                  ? "border-[var(--chat-accent)] bg-[var(--chat-accent)]/15 text-[var(--chat-accent)]"
+                  : "border-[var(--chat-border)] text-[var(--chat-muted)] hover:bg-[var(--chat-surface-hover)]"
+              }`}
+            >
+              <ShoppingBag className="size-5" aria-hidden />
+            </button>
+          )}
+
           <button
             type="button"
-            disabled={disabled || readingFiles}
+            disabled={disabled || readingFiles || shopMode}
             onClick={() => fileRef.current?.click()}
             aria-label="افزودن فایل"
             className="shrink-0 size-11 rounded-xl border border-[var(--chat-border)] text-[var(--chat-muted)] hover:text-[var(--chat-text)] hover:bg-[var(--chat-surface-hover)] cursor-pointer disabled:opacity-40 inline-flex items-center justify-center transition-colors"
@@ -245,7 +270,10 @@ export function ChatComposer({
                 ? disabledHint
                 : listening
                   ? "در حال شنیدن…"
-                  : "پیام خود را بنویسید…"
+                  : (placeholder ??
+                    (shopMode
+                      ? "چه محصولی می‌خواهید؟ تا چه قیمتی؟"
+                      : "پیام خود را بنویسید…"))
             }
             className="flex-1 max-h-40 min-h-[2.75rem] resize-none bg-transparent px-1 py-2 text-sm text-[var(--chat-text)] placeholder:text-[var(--chat-muted)] outline-none"
           />
@@ -303,8 +331,10 @@ export function ChatComposer({
         )}
 
         <p className="text-center text-[11px] text-[var(--chat-muted)] mt-2">
-          پاسخ‌ها توسط هوش مصنوعی تولید می‌شوند. برای تصمیم‌های مهم منابع را
-          بررسی کنید.
+          {footerHint ??
+            (shopMode
+              ? "نتایج از فروشگاه‌های متصل است؛ قیمت نهایی را در سایت فروشنده ببینید."
+              : "پاسخ‌ها توسط هوش مصنوعی تولید می‌شوند. برای تصمیم‌های مهم منابع را بررسی کنید.")}
         </p>
       </form>
     </div>

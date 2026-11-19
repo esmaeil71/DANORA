@@ -14,6 +14,8 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
+import { ShopOrchestratorService } from '../shop/shop-orchestrator.service';
+import { ShopProviderPatchDto } from '../shop/dto/shop.dto';
 import {
   PatchAdminModelDto,
   PatchAdminUserDto,
@@ -25,7 +27,10 @@ type AdminRequest = Request & { user: { id: string; role: string } };
 @Controller('admin')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
-  constructor(private readonly admin: AdminService) {}
+  constructor(
+    private readonly admin: AdminService,
+    private readonly shopOrchestrator: ShopOrchestratorService,
+  ) {}
 
   @Get('overview')
   overview() {
@@ -105,5 +110,21 @@ export class AdminController {
   @Patch('models/:id')
   patchModel(@Param('id') id: string, @Body() dto: PatchAdminModelDto) {
     return this.admin.patchModel(id, dto);
+  }
+
+  @Get('shop/health')
+  shopHealth() {
+    return this.shopOrchestrator.healthCheck();
+  }
+
+  @Get('shop/providers')
+  shopProviders() {
+    return this.shopOrchestrator.listProviders();
+  }
+
+  @Patch('shop/providers')
+  async patchShopProvider(@Body() dto: ShopProviderPatchDto) {
+    await this.shopOrchestrator.setProviderEnabled(dto.id, dto.enabled);
+    return this.shopOrchestrator.listProviders();
   }
 }

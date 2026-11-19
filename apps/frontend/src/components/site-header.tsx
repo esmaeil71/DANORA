@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
-import { MessageSquare, Settings, Sparkles } from "lucide-react";
+import { MessageSquare, Settings, ShoppingBag, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
 const marketingLinks = [
+  { href: "/#shop", label: "خرید هوشمند" },
   { href: "/#features", label: "امکانات" },
   { href: "/#models", label: "مدل‌ها" },
   { href: "/#faq", label: "سوالات" },
@@ -61,6 +62,10 @@ export function SiteHeader() {
               <Link to="/chat" className={linkClass}>
                 <MessageSquare className="size-4 sm:hidden" aria-hidden />
                 <span>چت</span>
+              </Link>
+              <Link to="/shop" className={linkClass}>
+                <ShoppingBag className="size-4 sm:hidden" aria-hidden />
+                <span className="hidden sm:inline">خرید</span>
               </Link>
               <Link to="/settings" className={`${linkClass} hidden sm:inline-flex`}>
                 <Settings className="size-4" aria-hidden />

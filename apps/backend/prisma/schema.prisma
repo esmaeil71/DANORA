@@ -29,6 +29,11 @@ enum ModelProvider {
   google
 }
 
+enum ConversationKind {
+  chat
+  shop
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -108,18 +113,20 @@ model SupportInquiry {
 }
 
 model Conversation {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  title     String   @default("گفتگوی جدید")
-  modelId   String   @map("model_id")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  title     String           @default("گفتگوی جدید")
+  modelId   String           @map("model_id")
+  kind      ConversationKind @default(chat)
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  createdAt DateTime         @default(now()) @map("created_at")
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   model    ModelCatalog @relation(fields: [modelId], references: [id])
   messages Message[]
 
   @@index([userId])
+  @@index([userId, kind])
   @@map("conversations")
 }
 
@@ -128,6 +135,7 @@ model Message {
   conversationId String      @map("conversation_id")
   role           MessageRole
   content        String      @db.Text
+  metadata       Json?
   tokenIn        Int         @default(0) @map("token_in")
   tokenOut       Int         @default(0) @map("token_out")
   createdAt      DateTime    @default(now()) @map("created_at")

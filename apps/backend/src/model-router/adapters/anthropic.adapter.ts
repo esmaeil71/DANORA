@@ -4,6 +4,7 @@ import { ChatMessage } from '@danora/shared';
 import { ModelProvider } from '@prisma/client';
 import Anthropic from '@anthropic-ai/sdk';
 import {
+  CompleteOptions,
   CompletionResult,
   ModelStreamConfig,
   ProviderAdapter,
@@ -68,5 +69,33 @@ export class AnthropicAdapter implements ProviderAdapter {
     tokenOut = finalMessage.usage.output_tokens;
 
     return { content, tokenIn, tokenOut };
+  }
+
+  async completeChat(
+    { apiModelName }: ModelStreamConfig,
+    messages: ChatMessage[],
+    options?: CompleteOptions,
+  ): Promise<CompletionResult> {
+    const client = this.getClient();
+    const system = messages.find((m) => m.role === 'system')?.content;
+    const chatMessages = messages
+      .filter((m) => m.role !== 'system')
+      .map((m) => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+      }));
+    const res = await client.messages.create({
+      model: apiModelName,
+      max_tokens: options?.maxTokens ?? 512,
+      system: system ?? undefined,
+      messages: chatMessages,
+    });
+    const text =
+      res.content[0]?.type === 'text' ? res.content[0].text : '';
+    return {
+      content: text,
+      tokenIn: res.usage.input_tokens,
+      tokenOut: res.usage.output_tokens,
+    };
   }
 }

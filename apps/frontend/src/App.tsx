@@ -6,6 +6,7 @@ import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ChatPage } from "./pages/ChatPage";
 import { ChatModelsPage } from "./pages/chat/ChatModelsPage";
+import { ShopPage } from "./pages/ShopPage";
 import { SettingsShell } from "./components/settings/settings-shell";
 import { SettingsHub } from "./pages/settings/SettingsHub";
 import { SettingsAccountPage } from "./pages/settings/SettingsAccountPage";
@@ -20,6 +21,7 @@ import { SettingsAdminUsersPage } from "./pages/settings/admin/SettingsAdminUser
 import { SettingsAdminUserDetailPage } from "./pages/settings/admin/SettingsAdminUserDetailPage";
 import { SettingsAdminRequestsPage } from "./pages/settings/admin/SettingsAdminRequestsPage";
 import { SettingsAdminModelsPage } from "./pages/settings/admin/SettingsAdminModelsPage";
+import { SettingsAdminShopPage } from "./pages/settings/admin/SettingsAdminShopPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
 export function App() {
@@ -32,6 +34,7 @@ export function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/chat/models" element={<ChatModelsPage />} />
+      <Route path="/shop" element={<ShopPage />} />
       <Route path="/settings" element={<SettingsShell />}>
         <Route index element={<SettingsHub />} />
         <Route path="account" element={<SettingsAccountPage />} />
@@ -46,6 +49,7 @@ export function App() {
         <Route path="admin/users/:userId" element={<SettingsAdminUserDetailPage />} />
         <Route path="admin/requests" element={<SettingsAdminRequestsPage />} />
         <Route path="admin/models" element={<SettingsAdminModelsPage />} />
+        <Route path="admin/shop" element={<SettingsAdminShopPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

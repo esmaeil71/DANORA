@@ -1,0 +1,76 @@
+.shop-dark {
+  --shop-bg: #0b100f;
+  --shop-surface: #151c1b;
+  --shop-surface-hover: #1f2827;
+  --shop-border: #2d3a38;
+  --shop-text: #f0fdfa;
+  --shop-muted: #94a3b8;
+  --shop-accent: #14b8a6;
+  --shop-accent-strong: #0d9488;
+  --shop-accent-soft: rgb(20 184 166 / 0.16);
+  --shop-user: #134e4a;
+  color: var(--shop-text);
+  background: var(--shop-bg);
+}
+
+.shop-light {
+  --shop-bg: #f0fdfa;
+  --shop-surface: #ffffff;
+  --shop-surface-hover: #ecfdf5;
+  --shop-border: #99f6e4;
+  --shop-text: #134e4a;
+  --shop-muted: #475569;
+  --shop-accent: #0d9488;
+  --shop-accent-strong: #0f766e;
+  --shop-accent-soft: rgb(13 148 136 / 0.12);
+  --shop-user: #ccfbf1;
+  color: var(--shop-text);
+  background: var(--shop-bg);
+}
+
+.shop-card {
+  border: 1px solid var(--shop-border);
+  background: var(--shop-surface);
+  border-radius: 1rem;
+}
+
+.shop-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--shop-accent-soft);
+  color: var(--shop-accent);
+}
+
+.shop-cta {
+  background: var(--shop-accent-strong);
+  color: #fff;
+  transition: background-color 200ms ease;
+}
+
+.shop-cta:hover {
+  background: var(--shop-accent);
+}
+
+.shop-pill {
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--shop-border);
+  background: var(--shop-surface);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.shop-pill-active {
+  border-color: var(--shop-accent);
+  background: var(--shop-accent-soft);
+  color: var(--shop-accent);
+}
+
+.shop-select {
+  border: 1px solid var(--shop-border);
+  background: var(--shop-surface);
+  color: var(--shop-text);
+}

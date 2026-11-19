@@ -1,12 +1,16 @@
 "use client";
 
 import { Bot, User } from "lucide-react";
+import type { ProductOffer } from "@/lib/shop-types";
+import { ShopProductGrid } from "@/components/shop/shop-product-grid";
 
 type Msg = {
   id: string;
   role: "user" | "assistant" | "system";
   content: string;
   streaming?: boolean;
+  products?: ProductOffer[];
+  fetchedAt?: string;
 };
 
 export function ChatMessages({ messages }: { messages: Msg[] }) {
@@ -29,15 +33,25 @@ export function ChatMessages({ messages }: { messages: Msg[] }) {
             <span className="shrink-0 size-8 rounded-lg bg-[var(--chat-accent)]/20 flex items-center justify-center">
               <Bot className="size-4 text-[var(--chat-accent)]" aria-hidden />
             </span>
-            <div className="flex-1 min-w-0 text-sm leading-7 whitespace-pre-wrap text-[var(--chat-text)]">
-              {m.content || (m.streaming ? (
-                <span className="inline-flex gap-1 text-[var(--chat-muted)]">
-                  <span className="animate-pulse">در حال نوشتن</span>
-                  <span className="animate-bounce">…</span>
-                </span>
-              ) : (
-                ""
-              ))}
+            <div className="flex-1 min-w-0 space-y-4">
+              <div className="text-sm leading-7 whitespace-pre-wrap text-[var(--chat-text)]">
+                {m.content || (m.streaming ? (
+                  <span className="inline-flex gap-1 text-[var(--chat-muted)]">
+                    <span className="animate-pulse">در حال نوشتن</span>
+                    <span className="animate-bounce">…</span>
+                  </span>
+                ) : (
+                  ""
+                ))}
+              </div>
+              {m.products && m.products.length > 0 && (
+                <div className="shop-light rounded-xl p-3 border border-[var(--chat-border)]">
+                  <ShopProductGrid
+                    products={m.products}
+                    fetchedAt={m.fetchedAt}
+                  />
+                </div>
+              )}
             </div>
           </div>
         ),

@@ -13,7 +13,10 @@ import {
   MessageRow,
   ModelRow,
   streamChat,
+  streamShop,
+  type SseHandler,
 } from "@/lib/api";
+import type { ProductOffer } from "@/lib/shop-types";
 import { useUserPrefs } from "@/hooks/use-user-prefs";
 import { loadUserPrefs } from "@/lib/user-prefs";
 import {
@@ -21,7 +24,11 @@ import {
   titleFromUserMessage,
 } from "@/lib/chat-title";
 
-type LocalMessage = MessageRow & { streaming?: boolean };
+type LocalMessage = MessageRow & {
+  streaming?: boolean;
+  products?: ProductOffer[];
+  fetchedAt?: string;
+};
 
 export function ChatClient() {
   const navigate = useNavigate();
@@ -39,6 +46,7 @@ export function ChatClient() {
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [modelOpen, setModelOpen] = useState(false);
+  const [shopMode, setShopMode] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const modelMenuRef = useRef<HTMLDivElement>(null);
@@ -144,7 +152,13 @@ export function ChatClient() {
     const conv = conversations.find((c) => c.id === id);
     if (conv) setModelId(conv.modelId);
     const msgs = await api<MessageRow[]>(`/conversations/${id}/messages`);
-    setMessages(msgs);
+    setMessages(
+      msgs.map((m) => ({
+        ...m,
+        products: m.metadata?.products,
+        fetchedAt: m.metadata?.fetchedAt,
+      })),
+    );
   }
 
   function newChat() {
@@ -201,9 +215,17 @@ export function ChatClient() {
 
     const sidebarTitle = titleFromUserMessage(text);
     const now = new Date().toISOString();
-    const requestConvId = isPendingConversationId(activeId)
-      ? undefined
-      : activeId;
+    const activeConv = conversations.find((c) => c.id === activeId);
+    const requestConvId =
+      isPendingConversationId(activeId) || !activeId
+        ? undefined
+        : shopMode
+          ? activeConv?.kind === "shop"
+            ? activeId
+            : undefined
+          : activeConv?.kind === "shop"
+            ? undefined
+            : activeId;
 
     if (!requestConvId) {
       const pendingId = `pending-${Date.now()}`;
@@ -232,58 +254,93 @@ export function ChatClient() {
     const ac = new AbortController();
     abortRef.current = ac;
 
+    let lastProducts: ProductOffer[] = [];
+    let fetchedAt: string | undefined;
+
+    const onEvent: SseHandler = (ev) => {
+      if (ev.type === "conversation" && ev.conversationId) {
+        setActiveId(ev.conversationId);
+        upsertSidebarConversation(
+          {
+            id: ev.conversationId,
+            title: ev.title ?? sidebarTitle,
+            modelId: ev.modelId ?? modelId,
+            updatedAt: ev.updatedAt ?? now,
+            kind: shopMode ? "shop" : ev.kind,
+          },
+          true,
+        );
+      }
+      if (ev.type === "products" && ev.products) {
+        lastProducts = ev.products;
+        fetchedAt = ev.fetchedAt;
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, products: ev.products, fetchedAt: ev.fetchedAt }
+              : m,
+          ),
+        );
+      }
+      if (ev.type === "delta" && ev.delta) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, content: m.content + ev.delta }
+              : m,
+          ),
+        );
+      }
+      if (ev.type === "done" && ev.conversationId) {
+        setActiveId(ev.conversationId);
+        api<ConversationRow[]>("/conversations").then(setConversations);
+      }
+      if (ev.type === "error") {
+        setError(ev.message ?? (shopMode ? "خطا در جستجو" : "خطا در چت"));
+        if (ev.conversationId) {
+          setActiveId(ev.conversationId);
+          upsertSidebarConversation(
+            {
+              id: ev.conversationId,
+              title: sidebarTitle,
+              modelId,
+              updatedAt: now,
+              kind: shopMode ? "shop" : undefined,
+            },
+            true,
+          );
+        } else if (!requestConvId) {
+          setConversations((list) =>
+            list.filter((c) => !isPendingConversationId(c.id)),
+          );
+          setActiveId(undefined);
+        }
+      }
+    };
+
     try {
-      await streamChat(
-        { conversationId: requestConvId, modelId, message: text },
-        (ev) => {
-          if (ev.type === "conversation" && ev.conversationId) {
-            setActiveId(ev.conversationId);
-            upsertSidebarConversation(
-              {
-                id: ev.conversationId,
-                title: ev.title ?? sidebarTitle,
-                modelId: ev.modelId ?? modelId,
-                updatedAt: ev.updatedAt ?? now,
-              },
-              true,
-            );
-          }
-          if (ev.type === "delta" && ev.delta) {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantId
-                  ? { ...m, content: m.content + ev.delta }
-                  : m,
-              ),
-            );
-          }
-          if (ev.type === "done" && ev.conversationId) {
-            setActiveId(ev.conversationId);
-            api<ConversationRow[]>("/conversations").then(setConversations);
-          }
-          if (ev.type === "error") {
-            setError(ev.message ?? "خطا در چت");
-            if (ev.conversationId) {
-              setActiveId(ev.conversationId);
-              upsertSidebarConversation(
-                {
-                  id: ev.conversationId,
-                  title: sidebarTitle,
-                  modelId,
-                  updatedAt: now,
-                },
-                true,
-              );
-            } else if (!requestConvId) {
-              setConversations((list) =>
-                list.filter((c) => !isPendingConversationId(c.id)),
-              );
-              setActiveId(undefined);
-            }
-          }
-        },
-        ac.signal,
-      );
+      if (shopMode) {
+        await streamShop(
+          { conversationId: requestConvId, modelId, message: text },
+          onEvent,
+          ac.signal,
+        );
+        if (lastProducts.length) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, products: lastProducts, fetchedAt }
+                : m,
+            ),
+          );
+        }
+      } else {
+        await streamChat(
+          { conversationId: requestConvId, modelId, message: text },
+          onEvent,
+          ac.signal,
+        );
+      }
 
       setMessages((prev) =>
         prev.map((m) =>
@@ -430,6 +487,8 @@ export function ChatClient() {
           onSubmit={send}
           sending={sending}
           disabled={!modelId}
+          shopMode={shopMode}
+          onShopModeChange={setShopMode}
           disabledHint={
             !modelId && models.length === 0
               ? "ابتدا مدل‌ها را با npm run db:seed بارگذاری کنید"

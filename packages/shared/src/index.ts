@@ -1,3 +1,5 @@
+import type { ShopSearchMetadata, SseConversationMetaEvent, SseProductsEvent } from './shop';
+
 export type MessageRole = 'user' | 'assistant' | 'system';
 
 export interface ChatMessage {
@@ -32,13 +34,23 @@ export interface SseErrorEvent {
   message: string;
 }
 
-export type SseChatEvent = SseDeltaEvent | SseDoneEvent | SseErrorEvent;
+export type SseChatEvent =
+  | SseDeltaEvent
+  | SseDoneEvent
+  | SseErrorEvent
+  | SseProductsEvent
+  | SseConversationMetaEvent;
+
+export * from './shop';
+
+export type ConversationKind = 'chat' | 'shop';
 
 export interface ConversationDto {
   id: string;
   title: string;
   modelId: string;
   updatedAt: string;
+  kind?: ConversationKind;
 }
 
 export interface MessageDto {
@@ -46,4 +58,5 @@ export interface MessageDto {
   role: MessageRole;
   content: string;
   createdAt: string;
+  metadata?: ShopSearchMetadata;
 }

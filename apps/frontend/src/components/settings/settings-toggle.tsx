@@ -50,7 +50,7 @@ export function SettingsToggle({
           "focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--st-bg)]",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           checked
-            ? "justify-end bg-violet-600 hover:bg-violet-500"
+            ? "justify-end bg-[var(--st-accent-strong)] hover:bg-[var(--st-accent)]"
             : "justify-start bg-[var(--st-surface-hover)] hover:bg-[var(--st-border)]",
           busy ? "opacity-80" : "",
         ].join(" ")}

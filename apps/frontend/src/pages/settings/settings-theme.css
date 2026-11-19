@@ -1,27 +1,206 @@
+/* Settings surfaces — aligned with design-system/danora/MASTER.md (teal accent) */
+
 .settings-dark {
-  --st-bg: #0f0f10;
-  --st-surface: #18181b;
-  --st-surface-hover: #27272a;
-  --st-border: #3f3f46;
-  --st-text: #fafafa;
-  --st-muted: #a1a1aa;
-  --st-accent: #8b5cf6;
-  --st-accent-soft: rgb(139 92 246 / 0.18);
+  --st-bg: #0b100f;
+  --st-bg-elevated: #0f1615;
+  --st-surface: #151c1b;
+  --st-surface-hover: #1f2827;
+  --st-border: #2d3a38;
+  --st-text: #f0fdfa;
+  --st-muted: #94a3b8;
+  --st-accent: #14b8a6;
+  --st-accent-strong: #0d9488;
+  --st-accent-soft: rgb(20 184 166 / 0.16);
+  --st-accent-muted: rgb(20 184 166 / 0.35);
+  --st-warn: #f59e0b;
+  --st-danger: #f87171;
+  --st-danger-soft: rgb(248 113 113 / 0.12);
   color: var(--st-text);
   background: var(--st-bg);
   min-height: 100dvh;
 }
 
 .settings-light {
-  --st-bg: #f4f4f5;
+  --st-bg: #f0fdfa;
+  --st-bg-elevated: #ecfdf5;
   --st-surface: #ffffff;
-  --st-surface-hover: #f4f4f5;
-  --st-border: #e4e4e7;
-  --st-text: #18181b;
-  --st-muted: #71717a;
-  --st-accent: #7c3aed;
-  --st-accent-soft: rgb(124 58 237 / 0.12);
+  --st-surface-hover: #f0fdfa;
+  --st-border: #99f6e4;
+  --st-text: #134e4a;
+  --st-muted: #475569;
+  --st-accent: #0d9488;
+  --st-accent-strong: #0f766e;
+  --st-accent-soft: rgb(13 148 136 / 0.12);
+  --st-accent-muted: rgb(13 148 136 / 0.28);
+  --st-warn: #d97706;
+  --st-danger: #dc2626;
+  --st-danger-soft: rgb(220 38 38 / 0.08);
   color: var(--st-text);
   background: var(--st-bg);
   min-height: 100dvh;
+}
+
+.settings-root {
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 100% -20%,
+      var(--st-accent-soft),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 80% 50% at 0% 100%,
+      color-mix(in srgb, var(--st-accent) 8%, transparent),
+      transparent 50%
+    ),
+    var(--st-bg);
+}
+
+.settings-header-link {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.75rem;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease;
+}
+
+.settings-header-link:hover {
+  background: var(--st-surface-hover);
+  color: var(--st-text);
+}
+
+.settings-header-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--st-bg), 0 0 0 4px var(--st-accent-muted);
+}
+
+.settings-section-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+  margin-bottom: 0.5rem;
+  padding-inline: 0.25rem;
+}
+
+.settings-card {
+  border: 1px solid var(--st-border);
+  background: var(--st-surface);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.settings-card--divide > * + * {
+  border-top: 1px solid var(--st-border);
+}
+
+.settings-row-link {
+  display: block;
+  border-radius: 1rem;
+  border: 1px solid var(--st-border);
+  background: var(--st-surface);
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.settings-row-link:hover {
+  border-color: var(--st-accent-muted);
+  background: var(--st-surface-hover);
+}
+
+.settings-row-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--st-accent-soft);
+}
+
+.settings-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding-inline: 1rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid var(--st-border);
+  background: var(--st-surface);
+  color: var(--st-text);
+  white-space: nowrap;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.settings-pill:hover {
+  border-color: var(--st-accent-muted);
+  background: var(--st-surface-hover);
+}
+
+.settings-pill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--st-accent-soft);
+}
+
+.settings-progress-track {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--st-surface-hover);
+  overflow: hidden;
+}
+
+.settings-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to left,
+    var(--st-accent),
+    var(--st-accent-strong)
+  );
+  transition: width 400ms ease;
+}
+
+.settings-progress-fill[data-level="warn"] {
+  background: linear-gradient(to left, var(--st-warn), #fbbf24);
+}
+
+.settings-progress-fill[data-level="critical"] {
+  background: linear-gradient(to left, var(--st-danger), #fb7185);
+}
+
+.settings-avatar {
+  background: linear-gradient(
+    135deg,
+    var(--st-accent-strong),
+    var(--st-accent)
+  );
+  color: #fff;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--st-accent) 35%, transparent);
+}
+
+.settings-admin-card {
+  border: 1px solid var(--st-accent-muted);
+  background: var(--st-accent-soft);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.settings-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--st-accent-soft);
+  color: var(--st-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-progress-fill {
+    transition: none;
+  }
 }

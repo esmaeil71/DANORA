@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Cpu, Inbox, LayoutDashboard, Users } from "lucide-react";
+import { Cpu, Inbox, LayoutDashboard, ShoppingBag, Users } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { SettingsLoading } from "@/components/settings/settings-loading";
@@ -69,6 +69,12 @@ export function SettingsAdminOverviewPage() {
             label="مدل‌ها"
             description="فعال/غیرفعال کردن مدل‌های چت"
             href="/settings/admin/models"
+          />
+          <SettingsMenuItem
+            icon={<ShoppingBag className="size-5" />}
+            label="خرید هوشمند"
+            description="مارکت‌پلیس‌ها و سلامت جستجو"
+            href="/settings/admin/shop"
           />
         </div>
       </SettingsPanel>

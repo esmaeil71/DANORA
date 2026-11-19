@@ -77,11 +77,14 @@ export interface ModelRow {
   displayName: string;
 }
 
+export type ConversationKind = "chat" | "shop";
+
 export interface ConversationRow {
   id: string;
   title: string;
   modelId: string;
   updatedAt: string;
+  kind?: ConversationKind;
 }
 
 export interface MessageRow {
@@ -89,6 +92,7 @@ export interface MessageRow {
   role: "user" | "assistant" | "system";
   content: string;
   createdAt: string;
+  metadata?: import("./shop-types").ShopSearchMetadata;
 }
 
 export type SseHandler = (event: {
@@ -98,8 +102,13 @@ export type SseHandler = (event: {
   title?: string;
   modelId?: string;
   updatedAt?: string;
+  kind?: ConversationKind;
   messageId?: string;
   message?: string;
+  products?: import("./shop-types").ProductOffer[];
+  fetchedAt?: string;
+  intent?: import("./shop-types").ShopIntent;
+  providerNotes?: Partial<Record<import("./shop-types").MarketplaceId, string>>;
 }) => void;
 
 export async function streamChat(
@@ -139,6 +148,46 @@ export async function streamChat(
         onEvent(JSON.parse(json) as Parameters<SseHandler>[0]);
       } catch {
         /* ignore parse errors */
+      }
+    }
+  }
+}
+
+export async function streamShop(
+  body: { conversationId?: string; modelId: string; message: string },
+  onEvent: SseHandler,
+  signal?: AbortSignal,
+) {
+  const res = await fetch(`${API_URL}/shop/completions`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+
+  if (!res.ok || !res.body) {
+    throw new Error("خطا در جستجوی خرید");
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split("\n\n");
+    buffer = parts.pop() ?? "";
+    for (const part of parts) {
+      const line = part.split("\n").find((l) => l.startsWith("data: "));
+      if (!line) continue;
+      const json = line.slice(6);
+      try {
+        onEvent(JSON.parse(json) as Parameters<SseHandler>[0]);
+      } catch {
+        /* ignore */
       }
     }
   }

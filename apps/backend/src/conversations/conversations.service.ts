@@ -19,6 +19,7 @@ export class ConversationsService {
         title: true,
         modelId: true,
         updatedAt: true,
+        kind: true,
       },
     });
   }
@@ -33,6 +34,7 @@ export class ConversationsService {
         role: true,
         content: true,
         createdAt: true,
+        metadata: true,
       },
     });
   }
@@ -68,6 +70,7 @@ export class ConversationsService {
         title: true,
         modelId: true,
         updatedAt: true,
+        kind: true,
       },
     });
   }
@@ -93,6 +96,7 @@ export class ConversationsService {
         title: true,
         modelId: true,
         updatedAt: true,
+        kind: true,
       },
     });
   }

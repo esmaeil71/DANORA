@@ -41,19 +41,19 @@ export function SettingsMenuItem(
     destructive,
   } = props;
 
-  const classes = `w-full flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-xl text-right transition-colors duration-200 cursor-pointer ${
+  const classes = `w-full flex items-center gap-3 min-h-[3.25rem] px-4 py-3 text-right transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:bg-[var(--st-surface-hover)] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--st-accent-muted)] ${
     disabled
       ? "opacity-50 cursor-not-allowed"
       : "hover:bg-[var(--st-surface-hover)]"
-  } ${destructive ? "text-red-400 hover:bg-red-500/10" : "text-[var(--st-text)]"}`;
+  } ${destructive ? "text-[var(--st-danger)] hover:bg-[var(--st-danger-soft)]" : "text-[var(--st-text)]"}`;
 
   const inner = (
     <>
       <span
         className={`size-10 shrink-0 rounded-xl inline-flex items-center justify-center ${
           destructive
-            ? "bg-red-500/10 text-red-400"
-            : "bg-[var(--st-surface-hover)] text-[var(--st-muted)]"
+            ? "bg-[var(--st-danger-soft)] text-[var(--st-danger)]"
+            : "bg-[var(--st-accent-soft)] text-[var(--st-accent)]"
         }`}
         aria-hidden
       >
@@ -68,9 +68,7 @@ export function SettingsMenuItem(
         )}
       </span>
       {badge && (
-        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-[var(--st-accent-soft)] text-violet-300">
-          {badge}
-        </span>
+        <span className="settings-badge shrink-0">{badge}</span>
       )}
       {!disabled && !destructive && (
         <ChevronLeft className="size-4 shrink-0 text-[var(--st-muted)]" aria-hidden />

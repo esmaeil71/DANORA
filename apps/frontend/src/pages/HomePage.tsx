@@ -207,6 +207,36 @@ export function HomePage() {
         </section>
 
         <LandingSection
+          id="shop"
+          eyebrow="جدید"
+          title="خرید هوشمند از چند فروشگاه"
+          description="بگو چه می‌خواهی — دانورا از دیجی‌کالا، ترب و منابع متصل لیست می‌آورد و لینک خرید می‌دهد."
+          className="border-b border-border"
+        >
+          <div className="max-w-3xl mx-auto landing-card p-6 sm:p-8 text-right space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              مثال: «کفش ورزشی مردانه تا ۲ میلیون تومان» — نتایج در کارت‌های
+              مقایسه‌ای با قیمت و دکمهٔ رفتن به فروشگاه.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to="/shop"
+                className="landing-focus min-h-11 inline-flex items-center gap-2 px-5 rounded-xl bg-primary text-white font-medium"
+              >
+                شروع خرید هوشمند
+                <ArrowLeft className="size-4" aria-hidden />
+              </Link>
+              <Link
+                to="/login"
+                className="landing-focus min-h-11 inline-flex items-center px-5 rounded-xl border border-border text-sm font-medium"
+              >
+                ورود برای دسترسی
+              </Link>
+            </div>
+          </div>
+        </LandingSection>
+
+        <LandingSection
           eyebrow="راه‌اندازی"
           title="سه قدم تا اولین پاسخ"
           description="بدون پیچیدگی اضافی — مسیر کوتاه از ثبت‌نام تا چت."
